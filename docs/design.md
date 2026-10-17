@@ -359,7 +359,7 @@ Gelöschte IDs dürfen später erneut verwendet werden.
 - `dict` zur Erstellung des Rezepts
 - `list` zur Verwaltung mehrerer Rezepte
 - `append()` zum Hinzufügen des Rezepts
-- `max()` als mögliche Hilfsfunktion zur ID-Ermittlung
+- `max()` als Hilfsfunktion zur ID-Ermittlung
 - `if` / `else` für Entscheidungen
 - `return` zur Übergabe von Ergebnissen
 - JSON-Dateiverarbeitung für die permanente Speicherung
