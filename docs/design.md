@@ -2,26 +2,42 @@
 
 ## 1. Projektübersicht
 
-Das Projekt ist eine lokale Python-Kommandozeilenanwendung (CLI), mit der ein Benutzer Rezepte erfassen, speichern, anzeigen, bearbeiten und verwalten kann.
+Das Projekt ist eine lokale Python-Kommandozeilenanwendung (CLI), mit der Benutzer Rezepte erfassen, speichern, anzeigen, bearbeiten und verwalten können. Die Anwendung wird von vier Gruppenmitgliedern gemeinsam entwickelt. Die einzelnen Funktionen werden auf mehrere Python-Module verteilt.
+
+**Dokumentationsstand:** Die grundlegende Rezepterfassung (US01) und die dazu benötigten Eingabeprüfungen (US09) sind implementiert und manuell getestet. Weitere User Storys und die Integration in das gemeinsame Hauptmenü sind noch in Entwicklung. Die nachfolgend beschriebenen Funktionen werden als *implementiert* oder *geplant* gekennzeichnet.
 
 ## 2. Datenmodell
 
-Alle Rezepte werden während der Programmausführung in einer Liste (`list`) verwaltet.
-
-Jedes Rezept ist ein Dictionary (`dict`).
+Alle Rezepte werden während der Programmausführung in einer Liste (`list`) verwaltet. Jedes Rezept ist ein Dictionary (`dict`). Die Liste wird zur dauerhaften Speicherung als JSON-Datei geschrieben.
 
 ### 2.1 Rezept
 
 | Feld | Datentyp | Beschreibung |
 |---|---|---|
-| id | int | Eindeutige Identifikationsnummer |
-| name | str | Name des Rezepts |
-| portions | int | Anzahl Portionen, grösser als 0 |
-| ingredients | list | Liste von Zutaten |
-| favorite | bool | Kennzeichnung als Favorit |
-| allergies | list | Liste zugeordneter Allergietypen |
+| `id` | `int` | Innerhalb der aktuellen Rezeptliste eindeutige Identifikationsnummer |
+| `name` | `str` | Name des Rezepts; darf nicht leer sein |
+| `portions` | `int` | Anzahl Portionen, grösser als 0 |
+| `ingredients` | `list` | Liste von mindestens einem Zutaten-Dictionary |
+| `favorite` | `bool` | Kennzeichnung als Favorit |
+| `allergies` | `list` | Liste zugeordneter Allergietypen |
 
-Neue Rezepte erhalten standardmässig `favorite = False` und eine leere Allergienliste.
+Neue Rezepte erhalten standardmässig `favorite = False` und eine leere Allergienliste `[]`. Favoriten und Allergien werden in anderen User Storys weiterbearbeitet.
+
+Beispiel eines neu erfassten Rezepts:
+
+```python
+{
+    "id": 1,
+    "name": "Pfannkuchen",
+    "portions": 2,
+    "ingredients": [
+        {"name": "Mehl", "amount": 250.0, "unit": "g"},
+        {"name": "Milch", "amount": 200.0, "unit": "ml"}
+    ],
+    "favorite": False,
+    "allergies": []
+}
+```
 
 ### 2.2 Zutat
 
@@ -29,107 +45,155 @@ Jede Zutat wird ebenfalls als Dictionary dargestellt.
 
 | Feld | Datentyp | Beschreibung |
 |---|---|---|
-| name | str | Name der Zutat |
-| amount | float | Menge, grösser als 0 |
-| unit | str | Einheit der Zutat |
+| `name` | `str` | Name der Zutat; darf nicht leer sein |
+| `amount` | `float` | Endliche, positive Menge, grösser als 0 |
+| `unit` | `str` | Einheit der Zutat |
 
-Zulässige Einheiten: `g`, `ml`, `Stück`.
+Zulässige Einheiten in der aktuellen Umsetzung: `g`, `ml`, `Stück`. Die Eingabe wird derzeit auf diese exakten Schreibweisen geprüft.
 
 ### 2.3 Identifikation
 
-Jedes Rezept erhält eine eindeutige ID. Die ID wird nicht verändert, wenn das Rezept bearbeitet wird. Die ID muss innerhalb der aktuell gespeicherten Rezepte eindeutig sein. Beim Erstellen eines neuen Rezepts wird die höchste vorhandene ID um 1 erhöht. Falls noch keine Rezepte vorhanden sind, beginnt die Nummerierung bei 1. Gelöschte IDs dürfen später erneut vergeben werden.
+Jedes Rezept erhält eine eindeutige ID. Die ID wird beim Bearbeiten eines Rezepts nicht verändert. Die ID muss innerhalb der aktuell gespeicherten Rezepte eindeutig sein.
+
+Beim Erstellen eines neuen Rezepts wird die höchste vorhandene ID um 1 erhöht. Falls keine Rezepte vorhanden sind, beginnt die Nummerierung bei 1. Bei dieser Regel können gelöschte IDs nur dann erneut vergeben werden, wenn sie oberhalb der höchsten aktuell verbliebenen ID liegen. Eine lückenlose Nummerierung ist nicht erforderlich.
 
 ## 3. Datenspeicherung
 
-Die Speicherung erfolgt lokal in einer JSON-Datei.
+Die dauerhafte Speicherung erfolgt lokal in der JSON-Datei `data/recipes.json`.
 
-Geplanter Speicherort: `data/recipes.json`
+- `save_recipes(recipes)` in `storage.py` schreibt die gesamte Rezeptliste mit `json.dump()`.
+- `load_recipes()` in `storage.py` lädt sie mit `json.load()`.
+- Die Datei wird mit UTF-8 verarbeitet; `ensure_ascii=False` erhält Umlaute lesbar, `indent=4` formatiert die Ausgabe.
+- Beim Speichern wird der Dateimodus `"w"` verwendet. Deshalb müssen vor dem Hinzufügen eines Rezepts die bisherigen Rezepte geladen werden, damit diese nicht überschrieben werden.
+- Existiert die JSON-Datei nicht, gibt `load_recipes()` eine leere Liste `[]` zurück.
+- Enthält die Datei ungültiges JSON, zeigt `load_recipes()` eine Fehlermeldung und gibt den `json.JSONDecodeError` mit `raise` weiter. Dadurch wird der normale Ablauf vor dem Speichern unterbrochen.
+
+**Stand der Umsetzung:** Lesen, Schreiben, erneutes Laden nach Programmneustart sowie die beiden genannten Fehlerfälle wurden manuell getestet. Weitere Fehlerfälle, insbesondere fehlende Schreibrechte, sind noch nicht gesondert behandelt. Die verwendeten relativen Pfade setzen derzeit voraus, dass das Programm aus dem Projektverzeichnis gestartet wird.
 
 ## 4. Grundprinzipien
 
 - Eingabe, Verarbeitung und Ausgabe werden möglichst getrennt.
 - Eine Funktion soll eine klar definierte Aufgabe erfüllen.
 - Die Module verwenden das gemeinsame Datenmodell.
-- Ungültige Benutzereingaben dürfen keinen Programmabbruch verursachen.
-- Änderungen an Rezepten werden dauerhaft gespeichert.
+- Ungültige Benutzereingaben sollen keinen Programmabbruch verursachen, sondern erneut abgefragt werden.
+- Rezeptänderungen werden dauerhaft gespeichert.
+- Beschädigte gespeicherte Daten dürfen nicht stillschweigend überschrieben werden.
+- Gemeinsame Funktionen sollen durch andere Module wiederverwendbar sein.
 
-## 5. Noch offene Entscheidungen
+## 5. Getroffene und offene Entscheidungen
+
+### 5.1 Getroffene Entscheidungen
+
+- Ein Rezept muss mindestens eine Zutat enthalten.
+- Die aktuell erlaubten Einheiten sind `g`, `ml` und `Stück`.
+- Rezept-IDs werden nach der Regel *höchste vorhandene ID + 1* vergeben; bei leerer Liste beginnt die Zählung bei 1.
+- Neue Rezepte erhalten `favorite = False` und `allergies = []`.
+- Eine fehlende `data/recipes.json` führt beim Laden zu einer leeren Rezeptliste.
+- Eine JSON-Datei mit ungültigem Inhalt verursacht eine Fehlermeldung und einen Abbruch des aktuellen Ablaufs, damit sie nicht überschrieben wird.
+- Die dauerhafte Datenspeicherung erfolgt über `storage.py`.
+
+### 5.2 Noch offene Entscheidungen
 
 - Welche Allergietypen stehen zur Auswahl?
-- Sind Rezepte ohne Zutaten zulässig?
-- Wie werden eindeutige Rezept-IDs erzeugt?
-- Welches konkrete Importformat verwendet US02?
-- Wie soll das Programm bei einer fehlenden oder beschädigten JSON-Datei reagieren?
-- Benötigen wir noch ein Feld für Freitext, in dem der User die Kochanweisungen aufschreiben kann?
+- Welches konkrete Importformat verwendet US02? (Noch nicht festgelegt.)
+- Benötigt das Rezept zusätzlich ein Feld für Freitext/Kochanweisungen? (Noch nicht entschieden.)
+- Wie sollen Schreibfehler bei der Dateispeicherung und fehlerhafte Datenstrukturen in gültigem JSON behandelt werden?
+- Sollen die Einheiten- und Ja/Nein-Eingaben später auch alternative Schreibweisen erlauben (z. B. `stück`, `J`)?
 
 ## 6. Modulstruktur
 
-Das Programm wird in mehrere Python-Module aufgeteilt. Jedes Modul übernimmt einen klar definierten Aufgabenbereich.
+Das Programm ist in mehrere Python-Module aufgeteilt. Jedes Modul übernimmt einen möglichst klar abgegrenzten Aufgabenbereich.
 
 ### 6.1 Modulübersicht und Verantwortlichkeiten
 
-| Modul | Aufgabe | User Story | Verantwortlich |
+| Modul | Aufgabe | User Story / Bezug | Verantwortlich |
 |---|---|---|---|
-| main.py | Programmstart, Hauptmenü und Ablaufsteuerung | US10 | Agshayan |
-| recipe_input.py | Neue Rezepte erfassen | US01 | Alessandro |
-| validation.py | Benutzereingaben überprüfen | US09 | Alessandro |
-| storage.py | Rezeptdaten laden, speichern und importieren | US02 / gemeinsame Datenspeicherung | Alessandro / Team |
-| recipe_management.py | Rezepte anzeigen, bearbeiten und löschen | US03, US04, US05 | Jennifer |
-| recipe_tools.py | Zutatenmengen skalieren und Einkaufslisten erstellen | US06, US07 | Agshayan |
-| recipe_features.py | Rezepte filtern, Favoriten und Allergien verwalten | US08, US11, US12 | Mai |
+| `main.py` | Programmstart und Ablaufsteuerung; bisher `create_recipe()`, später Hauptmenü | US01 / US10 | US01-Integration: Alessandro; Hauptmenü: Agshayan |
+| `recipe_input.py` | Neue Rezepte und Zutaten interaktiv erfassen | US01 | Alessandro |
+| `validation.py` | Benutzereingaben überprüfen | US09 | Alessandro |
+| `storage.py` | Rezeptdaten laden und speichern; Importfunktion geplant | Gemeinsame Datenspeicherung / US02 | Alessandro / Team |
+| `recipe_management.py` | IDs für neue Rezepte vergeben; Anzeigen, Bearbeiten, Löschen geplant | US01 / US03–US05 | ID-Vergabe: Alessandro; weitere Verwaltung: Jennifer |
+| `recipe_tools.py` | Zutatenmengen skalieren und Einkaufslisten erstellen | US06, US07 | Agshayan |
+| `recipe_features.py` | Rezepte filtern, Favoriten und Allergien verwalten | US08, US11, US12 | Mai |
 
 ### 6.2 Zusammenarbeit der Module
 
-- `main.py` steuert die Ausführung der verschiedenen Programmfunktionen.
-- Die Rezepte werden beim Programmstart aus einer JSON-Datei geladen.
-- Die anderen Module erhalten die benötigten Rezeptdaten zur Verarbeitung.
-- Änderungen an Rezeptdaten werden über die Speicherfunktionen dauerhaft gespeichert.
-- Die Funktionen zur Eingabevalidierung sollen von mehreren Modulen verwendet werden können.
+- `main.py` koordiniert die Funktionen und ruft für US01 die Eingabe, ID-Vergabe und Speicherung auf.
+- `recipe_input.py` ruft die passenden Funktionen aus `validation.py` auf.
+- `recipe_management.py` ermittelt die nächste ID anhand bereits vorhandener Rezepte.
+- `storage.py` liest und schreibt die gemeinsame JSON-Rezeptliste.
+- Andere Module erhalten benötigte Daten über Parameter und Rückgabewerte.
+- Ein gemeinsames Hauptmenü ist geplant und noch nicht Teil der aktuell getesteten US01-Funktion.
 
 ### 6.3 Entwicklungsprinzipien
 
 - Jedes Modul enthält logisch zusammengehörige Funktionen.
 - Jede Funktion soll möglichst nur eine Aufgabe erfüllen.
-- Eingabe, Verarbeitung und Ausgabe sollen soweit sinnvoll voneinander getrennt werden.
+- Eingabe, Verarbeitung und Ausgabe sollen soweit sinnvoll getrennt werden.
 - Die gesamte Gruppe verwendet dasselbe Datenmodell.
-- Jedes Gruppenmitglied entwickelt seine zugeteilten User Stories selbstständig.
-- Änderungen am gemeinsamen Programm werden über GitHub dokumentiert.
-- Die Modulverantwortlichkeiten und Schnittstellen werden innerhalb der Gruppe abgestimmt.
+- Jedes Gruppenmitglied entwickelt seine zugeteilten User Storys selbstständig.
+- Änderungen werden über eigene Git-Branches, Commits und Pull Requests dokumentiert.
+- Die Modulverantwortlichkeiten und Schnittstellen werden bei der Integration innerhalb der Gruppe abgestimmt.
 
 ## 7. Function Tree
 
-Die Anwendung wird in kleine, wiederverwendbare Funktionen unterteilt.
+Die Anwendung wird in kleine, wiederverwendbare Funktionen unterteilt. Die Übersicht unterscheidet die bereits implementierten Funktionen von geplanten Teilen.
 
-### 7.1 Hauptfunktionen
+### 7.1 Implementierte Funktionen (US01 und verwendete US09-Funktionen)
 
-| Modul | Geplante Funktionen |
+| Modul | Funktion | Aufgabe |
+|---|---|---|
+| `main.py` | `create_recipe()` | Gesamten Ablauf von Laden bis Speichern koordinieren |
+| `recipe_input.py` | `ask_recipe()` | Rezeptdaten ohne ID erfassen und Dictionary erstellen |
+| `recipe_input.py` | `ask_recipe_name()` | Gültigen Rezeptnamen abfragen |
+| `recipe_input.py` | `ask_portions()` | Gültige Portionszahl abfragen |
+| `recipe_input.py` | `ask_ingredients()` | Eine oder mehrere Zutaten erfassen |
+| `recipe_input.py` | `ask_ingredient()` | Ein Zutaten-Dictionary erstellen |
+| `recipe_input.py` | `ask_ingredient_name()` | Gültigen Zutatennamen abfragen |
+| `recipe_input.py` | `ask_ingredient_amount()` | Gültige Menge abfragen |
+| `recipe_input.py` | `ask_ingredient_unit()` | Gültige Einheit abfragen |
+| `validation.py` | `validate_text()` | Nicht leeren Text erkennen (`bool`) |
+| `validation.py` | `validate_portions()` | Positive Ganzzahl oder `None` zurückgeben |
+| `validation.py` | `validate_amount()` | Positive, endliche Dezimalzahl oder `None` zurückgeben |
+| `validation.py` | `validate_unit()` | Erlaubte Einheit prüfen (`bool`) |
+| `validation.py` | `validate_yes_no()` | `j` → `True`, `n` → `False`, sonst `None` |
+| `recipe_management.py` | `generate_next_id(recipes)` | Nächste Rezept-ID berechnen |
+| `recipe_management.py` | `add_recipe_id(recipe, recipes)` | ID zum neuen Rezept-Dictionary hinzufügen |
+| `storage.py` | `load_recipes()` | Rezeptliste aus JSON laden |
+| `storage.py` | `save_recipes(recipes)` | Rezeptliste als JSON speichern |
+
+### 7.2 Geplante weitere Funktionen
+
+| Modul | Geplante Funktionen / Aufgaben |
 |---|---|
-| main.py | main(), show_menu(), process_choice() |
-| recipe_input.py | create_recipe(), input_ingredient() |
-| validation.py | validate_text(), validate_portions(), validate_amount(), validate_unit() |
-| storage.py | load_recipes(), save_recipes(), import_recipe() |
-| recipe_management.py | show_recipes(), edit_recipe(), delete_recipe() |
-| recipe_tools.py | scale_recipe(), create_shopping_list() |
-| recipe_features.py | filter_recipes(), manage_favorites(), manage_allergies() |
+| `main.py` | `main()`, `show_menu()`, `process_choice()` – gemeinsames Hauptmenü und Steuerung |
+| `storage.py` | Importfunktion für US02; genauer Name und Format noch offen |
+| `recipe_management.py` | `show_recipes()`, `edit_recipe()`, `delete_recipe()` |
+| `recipe_tools.py` | `scale_recipe()`, `create_shopping_list()` |
+| `recipe_features.py` | `filter_recipes()`, `manage_favorites()`, `manage_allergies()` |
 
-Die Funktionsnamen sind vorläufig und werden bei der Implementierung geprüft.
+Die geplanten Funktionsnamen bleiben vorläufig, bis die jeweiligen User Storys umgesetzt und im Team integriert sind.
 
-### 7.2 Grundsätze
+### 7.3 Grundsätze
 
-- Jede Funktion soll möglichst genau eine Aufgabe erfüllen.
+- Funktionen werden möglichst für genau eine Aufgabe eingesetzt.
 - Gemeinsam benötigte Funktionen werden wiederverwendet.
-- Die Module tauschen Daten über klar definierte Parameter und Rückgabewerte aus.
-- Die Datei `main.py` koordiniert den Programmablauf.
+- Die Module tauschen Daten über Parameter und Rückgabewerte aus.
+- `main.py` koordiniert den Ablauf, während andere Module Eingabe, Validierung, Verwaltung und Speicherung übernehmen.
 
 ## 8. Main Decision and Control Flow
 
 ### 8.1 Programmstart
 
+**Geplant für die Gesamtanwendung:**
+
 1. Das Programm wird gestartet.
 2. Bereits gespeicherte Rezepte werden aus der JSON-Datei geladen.
 3. Das Hauptmenü wird angezeigt.
 
-### 8.2 Menüsteuerung
+**Aktuell implementiert:** `main.py` definiert die Funktion `create_recipe()`. Die Rezepterfassung startet erst, wenn diese Funktion aufgerufen wird; das spätere Hauptmenü ist noch nicht integriert.
+
+### 8.2 Menüsteuerung (geplant)
 
 1. Der Benutzer gibt eine Menüauswahl ein.
 2. Die Eingabe wird geprüft.
@@ -140,232 +204,199 @@ Die Funktionsnamen sind vorläufig und werden bei der Implementierung geprüft.
 
 ### 8.3 Datenänderungen
 
-- Beim Erfassen, Bearbeiten oder Löschen von Rezepten werden die Rezeptdaten geändert.
-- Änderungen an Favoriten und Allergien werden ebenfalls gespeichert.
+- Beim Erfassen, Bearbeiten oder Löschen von Rezepten werden Rezeptdaten geändert.
+- Änderungen an Favoriten und Allergien sollen ebenfalls gespeichert werden.
 - Die Daten werden nach erfolgreichen Änderungen in die JSON-Datei geschrieben.
-- Die Skalierung von Zutaten verändert das ursprüngliche Rezept nicht.
+- Die geplante Skalierung von Zutaten soll das ursprüngliche Rezept nicht verändern.
 
 ### 8.4 Kontrollstrukturen
 
-- `if`, `elif`, `else`: Menüentscheidungen und Eingabeprüfung
-- `while`: Wiederholung des Hauptmenüs und gegebenenfalls von Benutzereingaben
-- `for`: Verarbeitung mehrerer Rezepte oder Zutaten
+- `if`, `elif`, `else`: Entscheidungen und Eingabeprüfung
+- `while`: Wiederholung ungültiger Eingaben und mehrerer Zutaten; später Hauptmenü
+- `for`: Durchlaufen von Rezepten bei der Ermittlung der höchsten ID und weitere Listenverarbeitung
+- `try`, `except`, `raise`: Behandlung von Eingabe- und Dateifehlern
 
 ### 8.5 Fehlerbehandlung
 
-Ungültige Benutzereingaben sollen verständliche Fehlermeldungen auslösen, ohne das Programm zu beenden.
+Ungültige Benutzereingaben werden verständlich gemeldet und erneut abgefragt. Zahlen werden mit `try`/`except ValueError` umgewandelt. Beim Laden der JSON-Datei gibt eine fehlende Datei `[]` zurück. Eine beschädigte JSON-Datei führt dagegen zu einer Fehlermeldung und Weitergabe des Fehlers, um unbeabsichtigtes Überschreiben zu vermeiden. Fehler beim Schreiben der Datei sind noch nicht gesondert behandelt.
 
-Fehler beim Lesen und Schreiben von Dateien müssen ebenfalls behandelt werden. Das genaue Verhalten wird während der Implementierung festgelegt.
-
-### 8.6 Control Flow – US01 Rezeptnamenvalidierung
+### 8.6 Control Flow – US01 Rezeptnamenvalidierung (implementiert)
 
 **Ziel:** Sicherstellen, dass der Benutzer einen gültigen, nicht leeren Rezeptnamen eingibt.
 
 **Zuständige Module:**
-- `recipe_input.py`: Benutzereingabe und Wiederholung
-- `validation.py`: Überprüfung des Rezeptnamens
 
-**Geplanter Ablauf:**
+- `recipe_input.py`: `ask_recipe_name()` – Benutzereingabe und Wiederholung
+- `validation.py`: `validate_text()` – Überprüfung des Textes
 
-1. Das Programm fordert den Benutzer auf, einen Rezeptnamen einzugeben.
-2. Die Eingabe wird als String (`str`) entgegengenommen.
-3. Der eingegebene Text wird an `validate_text()` übergeben.
-4. Die Funktion prüft, ob der Text nach dem Entfernen führender und nachgestellter Leerzeichen leer ist.
-5. Ist der Text leer, gibt `validate_text()` den Boolean `False` zurück.
-6. `recipe_input.py` erkennt den ungültigen Rückgabewert und zeigt eine verständliche Fehlermeldung an.
-7. Die Eingabe wird mithilfe einer `while`-Schleife wiederholt.
-8. Ist der Text gültig, gibt `validate_text()` den Boolean `True` zurück.
-9. Die Eingabeschleife wird beendet und der gültige Rezeptname übernommen.
-10. Das Programm fährt mit der Eingabe der Portionszahl fort.
+**Ablauf:**
 
-**Verwendete Python-Konzepte:**
-- `input()` zur Erfassung des Rezeptnamens
-- `str` als Datentyp
-- `strip()` zum Entfernen führender und nachgestellter Leerzeichen
-- `if` / `else` zur Gültigkeitsprüfung
-- `while` zur Wiederholung ungültiger Eingaben
-- `return` zur Rückgabe von `True` oder `False`
+1. `ask_recipe_name()` fordert den Benutzer zur Eingabe eines Rezeptnamens auf.
+2. Der eingegebene String wird an `validate_text()` übergeben.
+3. `validate_text()` prüft mithilfe von `strip()`, ob der Text nur aus Leerzeichen besteht oder leer ist.
+4. Bei ungültigem Text gibt `validate_text()` `False` zurück. Es erscheint eine Fehlermeldung, und die Eingabe wird mit `while` wiederholt.
+5. Bei gültigem Text gibt `validate_text()` `True` zurück. Die Schleife endet, und `ask_recipe_name()` gibt den eingegebenen Rezeptnamen zurück.
+6. Die Rezepterfassung fährt mit der Portionszahl fort.
 
-**Rückgabewerte von `validate_text()`:**
+**Verwendete Python-Konzepte:** `input()`, `str`, `strip()`, `if`/`else`, `while`, `return`.
 
-| Eingabe | Rückgabewert |
+| Eingabe an `validate_text()` | Rückgabewert |
 |---|---|
 | `"Spaghetti Napoli"` | `True` |
 | `"   "` | `False` |
 | `""` | `False` |
 | `"Risotto"` | `True` |
 
-**Architekturentscheidung:**
+**Architekturentscheidung:** `validate_text()` validiert nur den übergebenen Wert. Die Funktion fordert keine Eingabe an und zeigt keine Meldung. Die aktuelle Eingabefunktion gibt den ursprünglich eingegebenen String zurück; sie entfernt Leerzeichen nicht dauerhaft.
 
-Die Validierungsfunktion überprüft ausschliesslich den übergebenen Text. Sie fordert selbst keine Benutzereingaben an und gibt keine Fehlermeldungen aus.
+### 8.7 Control Flow – US01 Portionsvalidierung (implementiert)
 
-Dadurch kann die Funktion auch in anderen Modulen, beispielsweise beim Bearbeiten eines Rezeptnamens, wiederverwendet werden.
-
-### 8.7 Control Flow – US01 Portionsvalidierung
-
-**Ziel:** Der Benutzer muss eine gültige positive Ganzzahl für die Anzahl Portionen eingeben.
+**Ziel:** Eine positive Ganzzahl für die Portionen erfassen.
 
 **Zuständige Module:**
-- `recipe_input.py`: Benutzereingabe und Wiederholung
-- `validation.py`: Umwandlung und Validierung
 
-**Geplanter Ablauf:**
+- `recipe_input.py`: `ask_portions()`
+- `validation.py`: `validate_portions()`
 
-1. Das Programm fordert den Benutzer auf, die Anzahl Portionen einzugeben.
-2. Die Eingabe wird als String entgegengenommen.
-3. `validate_portions()` versucht, den String in einen Integer umzuwandeln.
-4. Ist die Umwandlung nicht möglich, wird der `ValueError` abgefangen und `None` zurückgegeben.
-5. Bei erfolgreicher Umwandlung wird geprüft, ob die Zahl grösser als 0 ist.
-6. Wenn die Zahl kleiner oder gleich 0 ist, wird `None` zurückgegeben.
-7. Wenn die Zahl positiv ist, wird der Integer zurückgegeben.
-8. Erhält `recipe_input.py` den Wert `None`, wird eine Fehlermeldung angezeigt und erneut nach der Portionszahl gefragt.
-9. Sobald eine gültige Portionszahl vorliegt, wird die Eingabeschleife beendet.
-10. Das Programm fährt mit der Erfassung der Zutaten fort.
+**Ablauf:**
 
-**Verwendete Python-Konzepte:**
-- `input()` zur Eingabe von Daten
-- `int()` zur Datentypumwandlung
-- `try` / `except ValueError` zur Fehlerbehandlung
-- `if` zur Prüfung des Zahlenbereichs
-- `while` zur Wiederholung ungültiger Eingaben
-- `return` zur Rückgabe eines Integers oder `None`
+1. `ask_portions()` fragt nach der Portionszahl.
+2. `validate_portions()` versucht, die Eingabe mit `int()` umzuwandeln.
+3. Bei `ValueError` oder einer Zahl kleiner oder gleich 0 wird `None` zurückgegeben.
+4. Bei einer positiven Ganzzahl wird der Integer zurückgegeben.
+5. Bei `None` erscheint eine Fehlermeldung und die Eingabe wird wiederholt.
+6. Sobald die Eingabe gültig ist, gibt `ask_portions()` den Integer zurück.
 
-### 8.8 Control Flow – US01 Zutatenerfassung
+**Verwendete Python-Konzepte:** `input()`, `int()`, `try`/`except ValueError`, `if`, `while`, `return`.
 
-**Ziel:** Der Benutzer kann eine oder mehrere Zutaten erfassen. Jede Zutat enthält einen Namen, eine Menge und eine Einheit.
+### 8.8 Control Flow – US01 Zutatenerfassung (implementiert)
+
+**Ziel:** Der Benutzer erfasst eine oder mehrere Zutaten. Jede Zutat besitzt einen Namen, eine Menge und eine Einheit.
 
 **Architekturentscheidungen:**
-- Ein Rezept muss mindestens eine Zutat enthalten.
-- Jede Zutat wird als Dictionary (`dict`) dargestellt.
-- Alle Zutaten eines Rezepts werden in einer Liste (`list`) gesammelt.
-- Zulässige Einheiten sind `g`, `ml` und `Stück`.
-- Ungültige Eingaben werden erneut angefordert, ohne bereits gültige Eingaben zu verlieren.
 
-**Zuständige Module:**
-- `recipe_input.py`: Erfassung einzelner Zutaten, Schleifensteuerung und Erstellung der Zutatenliste
-- `validation.py`: Überprüfung der Eingaben
+- Ein Rezept benötigt mindestens eine Zutat.
+- Jede Zutat wird als Dictionary dargestellt; alle Zutaten werden in einer Liste gesammelt.
+- Die zulässigen Einheiten sind `g`, `ml`, `Stück`.
+- Ungültige Eingaben werden einzeln wiederholt, ohne zuvor gültige Angaben zu verlieren.
+
+**Zuständige Module:** `recipe_input.py` für die Eingabe und `validation.py` für die Prüfung.
 
 #### 8.8.1 Einzelne Zutat erfassen
 
-Geplante Funktion: `input_ingredient()`
+**Implementierte Funktion:** `ask_ingredient()`
 
-1. Das Programm fordert den Benutzer auf, einen Zutatennamen einzugeben.
-2. Der Zutatenname wird mit `validate_text()` überprüft.
-3. Ist der Name ungültig, erscheint eine Fehlermeldung und die Namenseingabe wird wiederholt.
-4. Das Programm fordert den Benutzer auf, eine Menge einzugeben.
-5. `validate_amount()` versucht, die Eingabe in einen `float` umzuwandeln.
-6. Die Menge muss grösser als 0 sein. Bei einer ungültigen Eingabe wird `None` zurückgegeben.
-7. Bei `None` wird eine Fehlermeldung angezeigt und ausschliesslich die Mengenabfrage wiederholt.
-8. Anschliessend wird die Einheit erfasst.
-9. `validate_unit()` prüft, ob die Einheit `g`, `ml` oder `Stück` ist.
-10. Bei einer ungültigen Einheit wird nur die Einheitenabfrage wiederholt.
-11. Sobald alle drei Werte gültig sind, wird ein Zutaten-Dictionary erstellt.
-12. Die Funktion gibt das vollständige Zutaten-Dictionary zurück.
+1. `ask_ingredient_name()` fragt nach dem Zutatennamen; `validate_text()` überprüft die Eingabe.
+2. `ask_ingredient_amount()` fragt nach der Menge; `validate_amount()` versucht die Umwandlung mit `float()` und akzeptiert nur endliche Werte grösser als 0. Dazu wird `math.isfinite()` verwendet.
+3. `ask_ingredient_unit()` fragt nach der Einheit; `validate_unit()` prüft, ob sie in der Liste der zulässigen Einheiten enthalten ist.
+4. Jede ungültige Teilangabe führt zu einer Fehlermeldung und einer erneuten Frage nach genau dieser Angabe.
+5. `ask_ingredient()` erstellt und gibt ein Dictionary mit den Schlüsseln `name`, `amount` und `unit` zurück.
 
 #### 8.8.2 Mehrere Zutaten erfassen
 
-1. Eine leere Zutatenliste (`ingredients`) wird erstellt.
-2. `input_ingredient()` wird aufgerufen.
-3. Das zurückgegebene Zutaten-Dictionary wird mit `append()` zur Liste hinzugefügt.
-4. Das Programm fragt: „Weitere Zutat erfassen? (j/n)“.
-5. Die Eingabe wird durch `validate_yes_no()` überprüft.
-6. Bei `True` beginnt ein weiterer Durchlauf zur Erfassung einer neuen Zutat.
-7. Bei `False` wird die Zutatenschleife beendet.
-8. Bei `None` erscheint eine Fehlermeldung und ausschliesslich die Ja/Nein-Abfrage wird wiederholt.
-9. Die vollständige Zutatenliste wird für die Erstellung des Rezept-Dictionarys bereitgestellt.
+**Implementierte Funktion:** `ask_ingredients()`
+
+1. Eine leere Zutatenliste `ingredients` wird erstellt.
+2. Eine äussere `while`-Schleife erfasst mindestens eine Zutat mit `ask_ingredient()`.
+3. Das Zutaten-Dictionary wird mit `ingredients.append(ingredient)` ergänzt.
+4. Der Benutzer wird gefragt, ob er eine weitere Zutat hinzufügen möchte (`j`/`n`).
+5. `validate_yes_no()` gibt bei `j` `True`, bei `n` `False`, sonst `None` zurück.
+6. Eine innere `while`-Schleife wiederholt die Ja/Nein-Frage, solange das Ergebnis `None` ist.
+7. Bei `True` wird eine weitere Zutat erfasst. Bei `False` endet die äussere Schleife.
+8. Die vollständige Zutatenliste wird zurückgegeben.
 
 #### 8.8.3 Rückgabewerte
 
-| Funktion | Gültige Rückgabe | Ungültige Rückgabe |
+| Funktion | Gültige Rückgabe | Ungültige Eingabe |
 |---|---|---|
-| validate_text() | True | False |
-| validate_amount() | Positiver float | None |
-| validate_unit() | True | False |
-| validate_yes_no() | True oder False | None |
-| input_ingredient() | Zutaten-Dictionary | Keine Rückgabe bei ungültiger Eingabe, da diese wiederholt wird |
+| `validate_text()` | `True` | `False` |
+| `validate_amount()` | Positiver, endlicher `float` | `None` |
+| `validate_unit()` | `True` | `False` |
+| `validate_yes_no()` | `True` (`j`) oder `False` (`n`) | `None` |
+| `ask_ingredient()` | Zutaten-Dictionary | Fragt intern erneut |
+| `ask_ingredients()` | Liste mit mindestens einer Zutat | Fragt intern erneut |
 
 #### 8.8.4 Verwendete Python-Konzepte
 
-- `input()` zur Erfassung von Benutzereingaben
-- `str` für Zutatenname und Einheit
-- `float` für die Zutatenmenge
-- `dict` zur Speicherung einer einzelnen Zutat
-- `list` zur Speicherung mehrerer Zutaten
-- `append()` zum Hinzufügen von Zutaten
-- `while` zur Wiederholung von Eingaben und zur Erfassung mehrerer Zutaten
-- `if` / `else` zur Entscheidungssteuerung
-- `try` / `except ValueError` zur Behandlung ungültiger Mengeneingaben
-- `return` zur Übergabe validierter Werte und vollständiger Zutaten
+`input()`, `str`, `float`, `dict`, `list`, `append()`, `while`, `if`/`else`, `in`, `try`/`except ValueError`, `math.isfinite()`, `return`.
 
-### 8.9 Control Flow – US01 Rezept erstellen und speichern
+### 8.9 Control Flow – US01 Rezept erstellen und speichern (implementiert)
 
-**Ziel:** Die gültig erfassten Rezeptdaten werden zu einem vollständigen Rezept zusammengefügt und dauerhaft gespeichert.
+**Ziel:** Die gültig erfassten Rezeptdaten zu einem vollständigen Rezept zusammenführen, eine ID vergeben und die Rezeptliste dauerhaft speichern.
 
 **Zuständige Module:**
-- `recipe_input.py`: Rezept erstellen und zur Rezeptliste hinzufügen
-- `storage.py`: Rezeptliste dauerhaft speichern
+
+- `main.py`: `create_recipe()` – Ablaufsteuerung
+- `recipe_input.py`: `ask_recipe()` – Datenerfassung und Rezept-Dictionary ohne ID
+- `recipe_management.py`: `generate_next_id()` und `add_recipe_id()` – ID-Vergabe
+- `storage.py`: `load_recipes()` und `save_recipes()` – Dateiverarbeitung
 
 #### 8.9.1 Rezept-Dictionary erstellen
 
-1. Der gültige Rezeptname liegt als String vor.
-2. Die gültige Portionszahl liegt als Integer vor.
-3. Die erfassten Zutaten liegen als Liste von Dictionaries vor.
-4. Die höchste vorhandene Rezept-ID wird ermittelt.
-5. Die neue Rezept-ID wird durch Erhöhung der höchsten ID um 1 bestimmt. Bei einer leeren Rezeptliste wird die ID 1 vergeben.
-6. Ein neues Rezept-Dictionary wird erstellt.
+1. `ask_recipe()` ruft nacheinander `ask_recipe_name()`, `ask_portions()` und `ask_ingredients()` auf.
+2. Die Funktion erstellt ein Dictionary mit `name`, `portions` und `ingredients`.
+3. Zusätzlich werden `favorite = False` und `allergies = []` gesetzt.
+4. Das Dictionary wird **noch ohne ID** zurückgegeben.
+5. `generate_next_id(recipes)` ermittelt mit einer `for`-Schleife und einem Vergleich die höchste vorhandene ID, erhöht diese um 1 und gibt bei leerer Liste 1 zurück.
+6. `add_recipe_id(recipe, recipes)` ergänzt das Dictionary um den Schlüssel `id` und gibt es zurück.
 
-Das Rezept-Dictionary enthält folgende Felder:
+#### 8.9.2 Vollständigen Ablauf ausführen und speichern
 
-| Feld | Wert |
-|---|---|
-| id | Neue eindeutige Rezept-ID |
-| name | Validierter Rezeptname |
-| portions | Validierte Portionszahl |
-| ingredients | Liste der erfassten Zutaten |
-| favorite | False |
-| allergies | Leere Liste |
+Die Funktion `create_recipe()` in `main.py` führt diese Schritte aus:
 
-7. Das vollständige Rezept-Dictionary wird mit `append()` zur Liste `recipes` hinzugefügt.
+1. `load_recipes()` lädt die bestehende Rezeptliste.
+2. `ask_recipe()` erfasst die Daten eines neuen Rezepts.
+3. `add_recipe_id(recipe, recipes)` ergänzt die eindeutige ID.
+4. `recipes.append(recipe)` fügt das Rezept zur Liste hinzu.
+5. `save_recipes(recipes)` schreibt die aktualisierte Liste nach `data/recipes.json`.
+6. `print(recipes)` gibt derzeit die vollständige Rezeptliste zu Test- und Kontrollzwecken aus.
 
-#### 8.9.2 Rezept dauerhaft speichern
+Die Funktion wird derzeit gezielt aufgerufen; ihre Integration in das spätere Hauptmenü steht noch aus. Eine separate, benutzerfreundliche Erfolgsbestätigung ist noch nicht implementiert.
 
-1. Die aktualisierte Rezeptliste wird an `save_recipes()` übergeben.
-2. `save_recipes()` befindet sich im Modul `storage.py`.
-3. Die Rezeptliste wird in der Datei `data/recipes.json` gespeichert.
-4. Nach erfolgreicher Speicherung erscheint eine Bestätigung.
-5. Anschliessend kehrt das Programm zum Hauptmenü zurück.
+#### 8.9.3 Fehlerbehandlung und Datensicherheit
 
-#### 8.9.3 Fehlerbehandlung
-
-- Schlägt die Speicherung fehl, erscheint eine verständliche Fehlermeldung.
-- Das Programm darf eine fehlgeschlagene Speicherung nicht als erfolgreich bestätigen.
-- Das weitere Vorgehen nach einem Speicherfehler wird bei der Implementierung von `storage.py` festgelegt.
+- `load_recipes()` behandelt `FileNotFoundError` mit einer leeren Rezeptliste `[]`.
+- `load_recipes()` behandelt `json.JSONDecodeError` mit einer verständlichen Fehlermeldung und `raise`. Dadurch bricht der Ablauf ab, bevor `save_recipes()` ausgeführt wird.
+- Die Funktion `save_recipes()` schreibt derzeit im Modus `"w"` und verwendet noch keine spezielle Behandlung von Schreibfehlern.
+- Bei Fehlern während einer Speicherung darf das Programm künftig keinen Erfolg melden; diese zusätzliche Behandlung ist noch offen.
 
 #### 8.9.4 ID-Vergabe
 
-Jedes Rezept besitzt eine numerische ID.
+Die IDs werden nach der höchsten ID der aktuell vorhandenen Rezepte berechnet:
 
-Die ID muss innerhalb der aktuell gespeicherten Rezepte eindeutig sein.
+- Höchste vorhandene ID + 1
+- Bei leerer Liste: ID 1
 
-Neue IDs werden anhand der höchsten vorhandenen ID vergeben:
-
-- Höchste ID + 1
-- Falls keine Rezepte existieren: ID 1
-
-Gelöschte IDs dürfen später erneut verwendet werden.
+Die Umsetzung verwendet `highest_id = 0`, eine `for`-Schleife und einen `if`-Vergleich. Sie verwendet **nicht** die ursprünglich erwogene Funktion `max()`.
 
 #### 8.9.5 Verwendete Python-Konzepte
 
-- `dict` zur Erstellung des Rezepts
-- `list` zur Verwaltung mehrerer Rezepte
-- `append()` zum Hinzufügen des Rezepts
-- `max()` als Hilfsfunktion zur ID-Ermittlung
-- `if` / `else` für Entscheidungen
-- `return` zur Übergabe von Ergebnissen
-- JSON-Dateiverarbeitung für die permanente Speicherung
+`dict`, `list`, `append()`, `for`, `if`, `return`, Funktionsparameter und Rückgabewerte, Modul-Imports, `with open()`, `json.dump()`, `json.load()`, `try`/`except`, `raise`.
 
 #### 8.9.6 Architekturprinzip
 
-Die Erstellung eines Rezepts und das dauerhafte Speichern werden logisch getrennt.
+Die Eingabe, ID-Vergabe und dauerhafte Speicherung sind logisch getrennt. `main.py` koordiniert den Ablauf. `storage.py` stellt wiederverwendbare Funktionen zur Dateiverarbeitung bereit. `recipe_management.py` übernimmt die Berechnung und Zuweisung der ID.
 
-Die Zuständigkeit für die Dateiverarbeitung liegt bei `storage.py`, damit dieselben Speicherfunktionen auch von anderen Modulen verwendet werden können.
+### 8.10 Manuelle Tests – Stand US01
+
+Folgende Verhaltensweisen wurden im Verlauf der Entwicklung manuell geprüft:
+
+- Gültige und ungültige Rezeptnamen sowie Portionszahlen
+- Gültige und ungültige Zutatenangaben einschliesslich negativer Mengen und `inf`
+- Erfassung mehrerer Zutaten und Wiederholung einer ungültigen Ja/Nein-Eingabe
+- Erstellung eines vollständigen Rezept-Dictionaries
+- Vergabe der nächsten ID bei vorhandenen Rezepten und bei leerer Liste
+- JSON-Speicherung und erneutes Laden nach einem Programmneustart
+- Laden bei fehlender `recipes.json` → `[]`
+- Laden bei ungültiger JSON-Datei → `json.JSONDecodeError` und Abbruch
+- Import von `create_recipe()` ohne automatische Rezepterfassung; Start erst beim Funktionsaufruf
+
+Diese Tests wurden manuell durchgeführt. Automatisierte Tests und die Integrationstests mit dem gemeinsamen Hauptmenü stehen noch aus.
+
+## 9. Weitere Entwicklungsschritte
+
+1. **US02:** Importformat und Importverhalten definieren; Importfunktion entwickeln und testen.
+2. **Hauptmenü:** `create_recipe()` und die weiteren Gruppenfunktionen einbinden.
+3. **Weitere User Storys:** Anzeige, Bearbeitung, Löschung, Skalierung, Einkaufsliste, Filter, Favoriten und Allergien nach Gruppenaufteilung integrieren.
+4. **Qualitätssicherung:** Weitere Dateifehler und ungültige Datenstrukturen behandeln; gruppenübergreifende Tests durchführen.
+5. **Dokumentation:** Funktionsbaum, Verantwortlichkeiten und Kontrollfluss bei weiteren Implementierungen aktualisieren.
