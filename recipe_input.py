@@ -79,3 +79,17 @@ def ask_ingredients():
                 print("Ungültige Eingabe. Bitte mit j oder n antworten.")
 
     return ingredients
+
+def ask_recipe():
+    name = ask_recipe_name()
+    portions = ask_portions()
+    ingredients = ask_ingredients()
+    recipe = {
+        "name": name,
+        "portions": portions,
+        "ingredients": ingredients,
+        "favorite": False,
+        "allergies": []
+    }
+    return recipe
+
