@@ -1,4 +1,5 @@
 import json
+from validation import validate_import_recipe
 
 
 def save_recipes(recipes):
@@ -17,3 +18,19 @@ def load_recipes():
         raise
 
     return recipes
+
+def import_recipe(file_path):
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            recipe = json.load(file)
+        if not validate_import_recipe(recipe):
+            print("Das Rezept enthält ungültige Daten.")
+            return None
+    except FileNotFoundError:
+        print("Die Datei wurde nicht gefunden.")
+        return None
+    except json.JSONDecodeError:
+        print("Die Importdatei ist beschädigt.")
+        return None
+
+    return recipe
