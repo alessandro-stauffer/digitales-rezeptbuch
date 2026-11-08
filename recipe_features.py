@@ -40,8 +40,30 @@ def recipe_filter():
 
     if filtered_recipe == []:
         print("Es wurden keine Rezepte gefunden.")
+    else:
+        print(f"Das sind die Rezepte, die deinen Suchkriterien entsprechen: {', '.join([recipe['name'] for recipe in filtered_recipe])}")
 
     return filtered_recipe
+
+
+def user_input1_favorites(): #checkt nur user input1. Wenn ungültig wird wieder gefragt mithilfe while loop
+    recipes = load_recipes()
+    all_ids = []
+    for recipe in recipes:
+        all_ids.append(recipe["id"])
+    while True:
+        user_input1 = input("Welches Rezept möchtest du bearbeiten? (Bitte ID angeben)")
+        if user_input1.isdigit() and int(user_input1) in all_ids:
+            return user_input1
+        print("Die ID existiert nicht. Bitte überprüfe sie und versuche es noch einmal.")
+
+
+def user_input2_favorites(): #checkt nur user input2. Wenn ungültig wird wieder gefragt mithilfe while loop
+    while True:
+        user_input2 = input("Möchtest du das Rezept von den Favoriten entfernen oder zu den Favoriten hinzufügen? (Bitte mit 'entfernen' oder 'hinzufügen' antworten.)")
+        if user_input2.lower().strip() == "hinzufügen" or user_input2.lower().strip() == "entfernen":
+            return user_input2
+        print("Deine Eingabe ist ungültig. Bitte überprüfe sie und versuche es noch einmal.")
 
 
 def get_favorites():
@@ -53,14 +75,17 @@ def get_favorites():
 
     if favorite_recipes == []:
         print("Du hast keine Favoriten gespeichert.")
+    else:
+        print(f"Diese Rezepte sind deine Favoriten: {', '.join([recipe['name'] for recipe in favorite_recipes])}")
+
     return favorite_recipes
 
 
 def edit_favorites():
     recipes = load_recipes()
     for recipe in recipes:
-        print(f"Rezept: {recipe['name']}; ID: {recipe['id']}")
-    user_input1 = user_input1_favorites(recipes)
+        print(f"Rezept: {recipe['name']}; ID: {recipe['id']}; Favorites: {recipe['favorite']}")
+    user_input1 = user_input1_favorites()
     user_input2 = user_input2_favorites()
     for recipe in recipes:
         if user_input1 == str(recipe["id"]):
@@ -72,25 +97,6 @@ def edit_favorites():
                 print(f"Das Rezept für {recipe['name']} wurde von den Favoriten entfernt")
 
     save_recipes(recipes)
-
-
-def user_input2_favorites(): #checkt nur user input2. Wenn ungültig wird wieder gefragt mithilfe while loop
-    while True:
-        user_input2 = input("Möchtest du das Rezept von den Favoriten entfernen oder zu den Favoriten hinzufügen? (Bitte mit 'entfernen' oder 'hinzufügen' antworten.)")
-        if user_input2.lower().strip() == "hinzufügen" or user_input2.lower().strip() == "entfernen":
-            return user_input2
-        print("Deine Eingabe ist ungültig. Bitte überprüfe sie und versuche es noch einmal.")
-
-
-def user_input1_favorites(recipes): #checkt nur user input1. Wenn ungültig wird wieder gefragt mithilfe while loop
-    all_ids = []
-    for recipe in recipes:
-        all_ids.append(recipe["id"])
-    while True:
-        user_input1 = input("Welches Rezept möchtest du bearbeiten? (Bitte ID angeben)")
-        if user_input1.isdigit() and int(user_input1) in all_ids:
-            return user_input1
-        print("Die ID existiert nicht. Bitte überprüfe sie und versuche es noch einmal.")
 
 
 def user_input1_allergies():
@@ -122,13 +128,26 @@ def user_input2_allergies(): #checkt nur user input2. Wenn ungültig wird wieder
 
 def edit_allergies():
     recipes = load_recipes()
+    print(f"Das sind alle möglichen Allergien: {allergies}")
     for recipe in recipes:
-        print(f"Rezept: {recipe['name']}; ID: {recipe['id']}^; Allergien: {recipe['allergies']}")
-    user_input1 = user_input1_allergies()
-    user_input2 = user_input2_allergies()
+        print(f"Rezept: {recipe['name']}; ID: {recipe['id']}; Allergien: {recipe['allergies']}")
+    user_input1 = user_input1_favorites()
+    user_input2 = user_input1_allergies()
+    user_input3 = user_input2_allergies()
     for recipe in recipes:
-        if user_input2 == "hinzufügen":
-            for allergy in user_input1:
-                recipe["allergies"].append(allergy) #wir haben schon bei user_input2_allergies gecheckt ob 
-        elif user_input2 == "entfernen":
-            for allergy in user_input1:  
+        if int(user_input1) == recipe["id"] and user_input3.lower().strip() == "hinzufügen":
+            for allergy in user_input2:
+                if allergy in recipe["allergies"]:
+                    print(f"{allergy} ist bereits als Allergie hinterlegt.")
+                else:
+                    recipe["allergies"].append(allergy) #wir haben schon bei user_input2_allergies gecheckt ob 
+                    print(f"{allergy} wurde zu den Allergien von {recipe['name']} hinzugefügt.")
+        elif int(user_input1) == recipe["id"] and user_input3.lower().strip() == "entfernen":
+            for allergy in user_input2:  
+                if allergy not in recipe["allergies"]:
+                    print(f"{allergy} ist nicht als Allergie hinterlegt.")
+                else:
+                    recipe["allergies"].remove(allergy) #wir haben schon bei user_input2_allergies gecheckt ob die Allergie in der Liste ist
+                    print(f"{allergy} wurde von den Allergien von {recipe['name']} entfernt.")
+
+    save_recipes(recipes)
