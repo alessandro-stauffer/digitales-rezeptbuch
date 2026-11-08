@@ -26,3 +26,16 @@ def scale_recipe(recipe, new_portions):
     new_recipe["ingredients"] = new_ingredients
 
     return new_recipe
+
+
+def create_shopping_list(recipe, new_portions):
+    scaled_recipe = scale_recipe(recipe, new_portions)
+    if scaled_recipe is None:
+        return None
+
+    shopping_list = []
+
+    for ingredient in scaled_recipe["ingredients"]:
+        shopping_list.append(ingredient)
+
+    return shopping_list
