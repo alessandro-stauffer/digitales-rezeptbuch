@@ -95,7 +95,6 @@ Die dauerhafte Speicherung erfolgt lokal in der JSON-Datei `data/recipes.json`.
 ### 5.2 Noch offene Entscheidungen
 
 - Welche Allergietypen stehen zur Auswahl?
-- Welches konkrete Importformat verwendet US02? (Noch nicht festgelegt.)
 - Benötigt das Rezept zusätzlich ein Feld für Freitext/Kochanweisungen? (Noch nicht entschieden.)
 - Wie sollen Schreibfehler bei der Dateispeicherung und fehlerhafte Datenstrukturen in gültigem JSON behandelt werden?
 - Sollen die Einheiten- und Ja/Nein-Eingaben später auch alternative Schreibweisen erlauben (z. B. `stück`, `J`)?
@@ -393,10 +392,63 @@ Folgende Verhaltensweisen wurden im Verlauf der Entwicklung manuell geprüft:
 
 Diese Tests wurden manuell durchgeführt. Automatisierte Tests und die Integrationstests mit dem gemeinsamen Hauptmenü stehen noch aus.
 
+
+## US02 – Rezept importieren
+
+### Beschreibung
+
+Benutzer können ein bestehendes Rezept aus einer lokalen JSON-Datei importieren. Das Rezept wird vor dem Speichern validiert und anschliessend zur bestehenden Rezeptsammlung hinzugefügt.
+
+### Importformat
+
+Der Import erfolgt über eine JSON-Datei, die genau ein Rezept enthält.
+
+Folgende Felder sind erforderlich:
+
+| Feld | Datentyp | Beschreibung |
+|---|---|---|
+| `name` | String | Nicht leerer Rezeptname |
+| `portions` | Integer | Positive Ganzzahl |
+| `ingredients` | Liste | Mindestens eine Zutat |
+
+Jede Zutat muss folgende Felder enthalten:
+
+| Feld | Datentyp | Beschreibung |
+|---|---|---|
+| `name` | String | Nicht leerer Zutatenname |
+| `amount` | Integer oder Float | Positive, endliche Zahl |
+| `unit` | String | `g`, `ml` oder `Stück` |
+
+### Verarbeitung
+
+1. `import_recipe(file_path)` in `storage.py` liest die JSON-Datei ein.
+2. `validate_import_recipe(recipe)` in `validation.py` überprüft die Struktur und die Werte.
+3. Bei einem ungültigen Rezept wird `None` zurückgegeben und der Import abgebrochen.
+4. `import_new_recipe(file_path)` in `main.py` lädt die bestehenden Rezepte.
+5. Nur `name`, `portions` und `ingredients` werden auf Rezept-Ebene übernommen.
+6. `add_recipe_id()` vergibt eine neue eindeutige ID.
+7. Die Standardfelder `favorite = False` und `allergies = []` werden ergänzt.
+8. Das Rezept wird zur bestehenden Liste hinzugefügt und mit `save_recipes()` gespeichert.
+
+### Fehlerbehandlung
+
+- Fehlende Importdatei: `FileNotFoundError` wird abgefangen.
+- Beschädigtes JSON: `json.JSONDecodeError` wird abgefangen.
+- Ungültige Rezeptdaten: Die Validierung liefert `False`, der Import gibt `None` zurück.
+- Bei einem fehlgeschlagenen Import werden bestehende Rezepte nicht verändert.
+- Ist die gespeicherte Rezeptdatei beschädigt, wird der Fehler weitergegeben, um ein unbeabsichtigtes Überschreiben zu verhindern.
+
+### Durchgeführte Tests
+
+- Gültiges Rezept erfolgreich importiert.
+- Ungültige Rezeptdaten abgelehnt.
+- Fehlende und beschädigte Importdateien behandelt.
+- Mehrere Rezepte nacheinander importiert.
+- Eindeutige IDs vergeben und bestehende Rezepte erhalten.
+- Ein fehlgeschlagener Import verändert die gespeicherten Rezepte nicht.
+- Zusätzliche Felder auf Rezept-Ebene werden beim Speichern ignoriert.
 ## 9. Weitere Entwicklungsschritte
 
-1. **US02:** Importformat und Importverhalten definieren; Importfunktion entwickeln und testen.
-2. **Hauptmenü:** `create_recipe()` und die weiteren Gruppenfunktionen einbinden.
 3. **Weitere User Storys:** Anzeige, Bearbeitung, Löschung, Skalierung, Einkaufsliste, Filter, Favoriten und Allergien nach Gruppenaufteilung integrieren.
 4. **Qualitätssicherung:** Weitere Dateifehler und ungültige Datenstrukturen behandeln; gruppenübergreifende Tests durchführen.
 5. **Dokumentation:** Funktionsbaum, Verantwortlichkeiten und Kontrollfluss bei weiteren Implementierungen aktualisieren.
