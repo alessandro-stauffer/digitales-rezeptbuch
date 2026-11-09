@@ -136,5 +136,5 @@ def main():
             print("Diese Option ist nicht verfügbar.")
 
 
-if__name__=="__main__":
-main()
+if __name__ == "__main__":
+    main()
