@@ -1,1 +1,22 @@
-[]
+[
+    {
+        "name": "Tomatensuppe",
+        "portions": 4,
+        "ingredients": [
+            {
+                "name": "Tomaten",
+                "amount": 500.0,
+                "unit": "g"
+            },
+            {
+                "name": "Wasser",
+                "amount": 300.0,
+                "unit": "ml"
+            }
+        ],
+        "id": 1,
+        "favorite": false,
+        "allergies": []
+    }
+    
+]
