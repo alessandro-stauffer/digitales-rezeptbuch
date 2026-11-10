@@ -17,6 +17,33 @@
         "id": 1,
         "favorite": false,
         "allergies": []
+    },
+    {
+        "name": "dghfhg",
+        "portions": 4,
+        "ingredients": [
+            {
+                "name": "Mehl",
+                "amount": 2126546.8156546,
+                "unit": "g"
+            }
+        ],
+        "favorite": false,
+        "allergies": [],
+        "id": 2
+    },
+    {
+        "name": "Bolognese",
+        "portions": 4,
+        "ingredients": [
+            {
+                "name": "Pasta",
+                "amount": 2.0,
+                "unit": "g"
+            }
+        ],
+        "favorite": false,
+        "allergies": [],
+        "id": 3
     }
-
 ]
