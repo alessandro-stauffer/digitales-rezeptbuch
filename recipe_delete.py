@@ -4,10 +4,10 @@ import json
 
 # weiteres Vorgehen nachdem Rezept ausgewählt
 
-def recipe_delete(decision):
+def recipe_delete(decision,input):
     decision = input("Bist du dir ganz sicher, dass du das Rezept löschen möchtest? ").strip().lower()
         if decision == "j":
-            print("Alles klar, das Rezept wurde erfolgreich gelöscht !")
+            return("Alles klar, das Rezept wurde erfolgreich gelöscht !")
 
         elif decision == "n":
             print("Puuh, Glück gehabt, nichts ist gelöscht oder verloren :)")
