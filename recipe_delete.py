@@ -5,6 +5,7 @@ if decision == "j":
 elif decision == "n":
     print("Puuh, Glück gehabt, nichts ist gelöscht oder verloren :)")
 
-else: print("Oh ich habe deine Eingabe nicht verstanden, antworte am besten mit \'j' oder \'n' ;) ")
+else: print('Oh, tut mir Leid, ich habe deine Eingabe nicht verstanden - antworte am besten mit "j" oder "n" ;) ')
+
 
     
