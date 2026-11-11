@@ -15,7 +15,16 @@ elif decision == "n":
 else: print('Oh, tut mir Leid, ich habe deine Eingabe nicht verstanden - antworte am besten mit "j" oder "n" ;) ')
 
 
+
+
+from storage import load_recipes # Funktion Rezepte einfügen
+
 def recipe_delete(recipes):
-    if None recipes
+    recipes = def load_recipes() # Rezepte suchen
+    if not recipes:
         return
-    print("Keine Rezepte gefunden")
+        print("Keine Rezepte gefunden")
+
+    rezept_ID = input ("Welches Rezept möchtest du löschen?")
+
+        
