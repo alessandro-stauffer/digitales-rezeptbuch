@@ -5,12 +5,21 @@ import json
 from storage import load_recipes
 
 # Funktion Rezepte anzeigen
-def show_recipes()
+def show_recipes():
     recipes = load_recipes
-    
+
     # Status Rezeptbuch ist leer
-    if none recipes
+    if not recipes:
         print('\nKeine Rezepte vorhanden.\n')
         return
 
-# Frustmodus on: verdammt was stimmt hier nicht ??!!
+    # vorhandene Rezepte
+    print('\n === Deine Rezepte ===')
+
+    # i = Startpunkt
+    for i recipe in enumerate (recipes):
+
+         # +1 wegen Nummerierung ab 0
+        print(i+1, recipe["name"])
+        
+
