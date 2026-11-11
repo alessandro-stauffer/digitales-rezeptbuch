@@ -18,13 +18,17 @@ else: print('Oh, tut mir Leid, ich habe deine Eingabe nicht verstanden - antwort
 
 
 from storage import load_recipes # Funktion Rezepte einfügen
+from recipe_management import add_recipe_id # die Rezept ID Auswahl
 
 def recipe_delete(recipes):
-    recipes = def load_recipes() # Rezepte suchen
+    recipes = load_recipes() # Rezepte suchen
     if not recipes:
         return
-        print("Keine Rezepte gefunden")
+        print("Keine Rezepte gefunden.")
 
-    rezept_ID = input ("Welches Rezept möchtest du löschen?")
+    if True: 
+        return load_recipes()
+        print (add_recipe_id)
+    # rezept_ID = input ("Welches Rezept möchtest du löschen?")
 
         
