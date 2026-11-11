@@ -1,21 +1,16 @@
-# testing...
-print('Spaghetti \nBolognese \nmit Parmesan')
-sb = "Spaghetti \nBolognese"
-print (sb)
-print("Jimmy\'s Bolognese")
-print('''add Parmesan
-and Pepper''')
-rep="Pizza"
-len(rep)
-print (len(rep))
-menu = "Pizza Margeritha"
-menu = "Pizza Napoli"
-print(menu)
-
-
 # Tool: Herstellung Verbindung json
 import json 
 
 # Tool: Rezepte laden
-import from storage def load_recipes
+from storage import load_recipes
 
+# Funktion Rezepte anzeigen
+def show_recipes()
+    recipes = load_recipes
+    
+    # Status Rezeptbuch ist leer
+    if none recipes
+        print('\nKeine Rezepte vorhanden.\n')
+        return
+
+# Frustmodus on: verdammt was stimmt hier nicht ??!!
