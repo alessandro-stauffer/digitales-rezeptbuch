@@ -106,7 +106,7 @@ def user_input_allergies():
 
     while True:
         user_input = input("Gib die Allergien an, nach welchen du filtern möchtest. Wenn du fertig bist, bitte mit 'fertig' antworten.")
-        if user_input.lower().strip() in [x.lower() for x in allergies]:
+        if user_input.lower().strip() in [x.lower() for x in allergies] and user_input.lower().strip().capitalize() not in list_allergies:
             list_allergies.append(user_input.lower().strip().capitalize())
         elif user_input.lower().strip() == "fertig":
             if len(list_allergies) > 0:
@@ -124,7 +124,7 @@ def allergies_filter():
     input_allergies = user_input_allergies() #Liste mit eingegebenen Allergien
     recipes = load_recipes()
 
-    list_filteres_recipes = []
+    list_filtered_recipes = []
     for recipe in recipes:
         recipe_fits = True
         for allergy in input_allergies:
@@ -132,9 +132,14 @@ def allergies_filter():
                 recipe_fits = False
 
         if recipe_fits == True:
-            list_filteres_recipes.append(recipe) #only appends recipes which do not have the listed allergies in them
+            list_filtered_recipes.append(recipe) #only appends recipes which do not have the listed allergies in them
+
+    if list_filtered_recipes == []:
+        print("Es wurden keine Rezepte ohne diese Allergien gefunden.")
+    else:
+        print(f"Diese Rezepte enthalten keine deiner angegebenen Allergien: {', '.join([recipe['name'] for recipe in list_filtered_recipes])}")
         
-    return list_filteres_recipes 
+    return list_filtered_recipes 
   
 
 def recipe_filter():
@@ -149,6 +154,6 @@ def recipe_filter():
     if filtered_recipes == []:
         print("Es wurden keine Rezepte gefunden.")
     else:
-        print("Das sind deine gefilterten Rezepte: {', '.join([recipe['name'] for recipe in filtered_recipes])}")
+        print(f"Das sind deine gefilterten Rezepte: {', '.join([recipe['name'] for recipe in filtered_recipes])}")
        
     return filtered_recipes
