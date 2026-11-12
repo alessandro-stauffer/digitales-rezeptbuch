@@ -1,3 +1,6 @@
+# Tool: Herstellung Verbindung json
+import json
+
 # Tool: Rezepte laden
 from storage import load_recipes
 
@@ -45,3 +48,4 @@ def show_recipes():
     else: print ('\n--- kein Rezept gefunden ---\n(Eingabe ungültig ! Gib eine gültige Zahl ein)') # Buchstaben statt Zahl
 
 # Loop ? main.py oder display.py ?
+

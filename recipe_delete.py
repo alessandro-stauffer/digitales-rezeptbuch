@@ -1,5 +1,27 @@
-# Zugriff zu vorhandenen Rezepten 
+# Tool: Herstellung Verbindung json
 import json
+
+# Tool: Rezepte laden
+from storage import load_recipes
+
+# Tool: Rezepte speichern
+from storage import save_recipes
+
+def delete_recipe(recipes)
+    recipes = load_recipes()
+
+    # Status Rezeptbuch ist leer (kopiert von recipe_display)
+        if not recipes:
+            print('\n--- keine Rezepte vorhanden ---\n')
+            return
+
+        # vorhandene Rezepte (kopiert von recipe_display)
+        print('\n=== Deine Rezepte ===')
+        for i, recipe in enumerate (recipes):
+            print(i+1, recipe["name"])
+
+        # Rezept fürs Löschen wählen
+        number = input('\nWähle Rezept-Nr. zum löschen: ')
 
 
 # weiteres Vorgehen nachdem Rezept ausgewählt
@@ -17,7 +39,7 @@ else: print('Oh, tut mir Leid, ich habe deine Eingabe nicht verstanden - antwort
 
 
 
-from storage import load_recipes # Funktion Rezepte einfügen
+ # Funktion Rezepte einfügen
 from recipe_management import add_recipe_id # die Rezept ID Auswahl
 
 def recipe_delete(recipes):
