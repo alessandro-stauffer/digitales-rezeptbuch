@@ -23,7 +23,25 @@ def show_recipes():
         print(i+1, recipe["name"])
 
         # Rezept öffnen
-        id = input('\nWähle Rezept-Nr.: ')
+        number = input('\nWähle Rezept-Nr.: ')
 
-print('\nWähle Rezept-Nr.: ')
+        # Prüfung int
+        if number.isdigit():
+
+            # Umwandlung Zahl
+            number = int(number)
+
+            # Prüfung Rezeptliste Anz.
+            if 1 <= number <= len(recipe):
+                selected_recipe = recipes[number - 1]
+
+                # Detailansicht
+                print('\n --- Rezeptdetails --- ')
+                print(f"Rezept: {selected_recipe['name']}")
+                print(f"Portionen: {selected_recipe['portions']}")
+                print("Zutaten")
+                for ingredients in selected_recipe['ingredients']
+                    print(f' - {ingredients['name']}: {ingredients['amount']} {ingredients['unit']}')
+
+show_recipes()
 
