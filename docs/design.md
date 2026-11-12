@@ -91,10 +91,11 @@ Die dauerhafte Speicherung erfolgt lokal in der JSON-Datei `data/recipes.json`.
 - Eine fehlende `data/recipes.json` führt beim Laden zu einer leeren Rezeptliste.
 - Eine JSON-Datei mit ungültigem Inhalt verursacht eine Fehlermeldung und einen Abbruch des aktuellen Ablaufs, damit sie nicht überschrieben wird.
 - Die dauerhafte Datenspeicherung erfolgt über `storage.py`.
+- Zur Auswahl stehende Allergietypen: `Gluten`, `Laktose`, `Nüsse`, `Eier`, `Soja`, `Sesam`, `Krebstiere`, `Weichtiere` (US12).
+- Der Zutatenfilter (US08) zeigt nur Rezepte, die **alle** eingegebenen Zutaten enthalten. Der Vergleich ignoriert Gross-/Kleinschreibung, verlangt aber den exakten Zutatennamen (`mehl` findet `Mehl`, aber nicht `Dinkelmehl`).
 
 ### 5.2 Noch offene Entscheidungen
 
-- Welche Allergietypen stehen zur Auswahl?
 - Benötigt das Rezept zusätzlich ein Feld für Freitext/Kochanweisungen? (Noch nicht entschieden.)
 - Wie sollen Schreibfehler bei der Dateispeicherung und fehlerhafte Datenstrukturen in gültigem JSON behandelt werden?
 - Sollen die Einheiten- und Ja/Nein-Eingaben später auch alternative Schreibweisen erlauben (z. B. `stück`, `J`)?
@@ -169,7 +170,7 @@ Die Anwendung wird in kleine, wiederverwendbare Funktionen unterteilt. Die Über
 | `storage.py` | Importfunktion für US02; genauer Name und Format noch offen |
 | `recipe_management.py` | `show_recipes()`, `edit_recipe()`, `delete_recipe()` |
 | `recipe_tools.py` | `scale_recipe()`, `create_shopping_list()` |
-| `recipe_features.py` | `filter_recipes()`, `manage_favorites()`, `manage_allergies()` |
+| `recipe_features.py` | Umgesetzt, siehe Abschnitte US08, US11 und US12 |
 
 Die geplanten Funktionsnamen bleiben vorläufig, bis die jeweiligen User Storys umgesetzt und im Team integriert sind.
 
@@ -447,6 +448,109 @@ Jede Zutat muss folgende Felder enthalten:
 - Eindeutige IDs vergeben und bestehende Rezepte erhalten.
 - Ein fehlgeschlagener Import verändert die gespeicherten Rezepte nicht.
 - Zusätzliche Felder auf Rezept-Ebene werden beim Speichern ignoriert.
+
+## US08 – Nach Zutaten filtern
+
+### Beschreibung
+
+Benutzer können eine oder mehrere Zutaten eingeben. Angezeigt werden nur Rezepte, die alle eingegebenen Zutaten enthalten.
+
+### Funktionen (`recipe_features.py`)
+
+| Funktion | Aufgabe |
+|---|---|
+| `recipe_filter()` | Rezepte laden, Suchbegriffe abfragen, passende Rezepte ermitteln und anzeigen; gibt die Liste der passenden Rezepte zurück |
+| `input_ingredients()` | Zutaten nacheinander abfragen, bis `fertig` eingegeben wird; gibt die Liste der Suchbegriffe zurück |
+
+### Ablauf
+
+1. `input_ingredients()` fragt in einer `while`-Schleife nach Zutaten. Eingaben werden mit `strip()` und `lower()` vereinheitlicht.
+2. Leere Eingaben werden abgelehnt. `fertig` beendet die Eingabe erst, wenn mindestens eine Zutat erfasst wurde.
+3. `recipe_filter()` erstellt für jedes Rezept eine Liste der Zutatennamen in Kleinbuchstaben.
+4. Die Variable `recipe_fits` startet mit `True`. Fehlt ein Suchbegriff im Rezept, wird sie auf `False` gesetzt und die Prüfung mit `break` beendet.
+5. Passende Rezepte werden gesammelt und mit ihren Namen ausgegeben.
+6. Wird kein Rezept gefunden, erscheint die Meldung „Es wurden keine Rezepte gefunden.“
+
+### Durchgeführte Tests
+
+- Ein Suchbegriff, der in mehreren Rezepten vorkommt, zeigt alle diese Rezepte.
+- Mehrere Suchbegriffe zeigen nur Rezepte, die alle enthalten.
+- Suchbegriffe, die in keinem gemeinsamen Rezept vorkommen, führen zur Meldung „keine Rezepte gefunden“.
+- Gross-/Kleinschreibung und Leerzeichen am Anfang und Ende werden ignoriert.
+- Leere Eingabe und `fertig` ohne Zutat werden abgelehnt und erneut abgefragt.
+
+## US11 – Favoriten
+
+### Beschreibung
+
+Benutzer können Rezepte als Favoriten markieren, die Markierung wieder entfernen und alle Favoriten in einer Übersicht anzeigen. Verwendet wird das bestehende Feld `favorite` (`bool`).
+
+### Funktionen (`recipe_features.py`)
+
+| Funktion | Aufgabe |
+|---|---|
+| `get_favorites()` | Übersicht: alle Rezepte mit `favorite = True` anzeigen; gibt die Liste zurück |
+| `edit_favorites()` | Rezepte anzeigen, Rezept und Aktion abfragen, `favorite` setzen und speichern |
+| `user_input1_favorites()` | Gültige Rezept-ID abfragen; wird auch von US12 verwendet |
+| `user_input2_favorites()` | `hinzufügen` oder `entfernen` abfragen |
+
+### Ablauf `edit_favorites()`
+
+1. Alle Rezepte werden mit Name, ID und Favoritenstatus angezeigt.
+2. `user_input1_favorites()` fragt nach einer ID, bis eine Zahl eingegeben wird, die als Rezept-ID existiert.
+3. `user_input2_favorites()` fragt nach `hinzufügen` oder `entfernen`, bis eine gültige Eingabe erfolgt (unabhängig von Gross-/Kleinschreibung).
+4. Beim gewählten Rezept wird `favorite` auf `True` bzw. `False` gesetzt und eine Bestätigung ausgegeben.
+5. Die Rezeptliste wird mit `save_recipes()` gespeichert.
+
+### Durchgeführte Tests
+
+- Rezept als Favorit markieren und wieder entfernen; Änderung bleibt nach erneutem Laden erhalten.
+- Nicht existierende ID (`99`) und Text (`abc`) werden abgelehnt und erneut abgefragt.
+- Ungültige Aktion (`x`) wird abgelehnt; `Hinzufügen` mit Grossbuchstaben wird akzeptiert.
+- Übersicht ohne Favoriten zeigt „Du hast keine Favoriten gespeichert.“; mit Favoriten werden deren Namen angezeigt.
+
+## US12 – Allergien
+
+### Beschreibung
+
+Benutzer können bei einem Rezept Allergien aus einer festen Auswahlliste hinterlegen und wieder entfernen. Die Allergien werden im bestehenden Feld `allergies` (`list`) gespeichert.
+
+### Auswahlliste
+
+Die erlaubten Allergietypen sind als Liste `allergies` am Anfang von `recipe_features.py` definiert:
+`Gluten`, `Laktose`, `Nüsse`, `Eier`, `Soja`, `Sesam`, `Krebstiere`, `Weichtiere`.
+
+### Funktionen (`recipe_features.py`)
+
+| Funktion | Aufgabe |
+|---|---|
+| `edit_allergies()` | Auswahlliste und Rezepte anzeigen, Eingaben abfragen, Allergien hinzufügen oder entfernen und speichern |
+| `user_input1_allergies()` | Allergien nacheinander abfragen, bis `fertig` eingegeben wird; gibt eine Liste gültiger Allergien zurück |
+| `user_input2_allergies()` | `hinzufügen` oder `entfernen` abfragen |
+| `user_input1_favorites()` | Gültige Rezept-ID abfragen (aus US11 wiederverwendet) |
+
+### Ablauf `edit_allergies()`
+
+1. Die Auswahlliste und alle Rezepte mit ihren aktuellen Allergien werden angezeigt.
+2. `user_input1_favorites()` fragt nach einer gültigen Rezept-ID.
+3. `user_input1_allergies()` fragt nach Allergien:
+   - Nur Allergien aus der Auswahlliste werden akzeptiert (Vergleich ohne Gross-/Kleinschreibung).
+   - Gespeichert wird die einheitliche Schreibweise mit grossem Anfangsbuchstaben (`capitalize()`), z. B. `gluten` → `Gluten`.
+   - Eine bereits eingegebene Allergie wird nicht doppelt aufgenommen.
+4. `user_input2_allergies()` fragt nach `hinzufügen` oder `entfernen`.
+5. Für jede gewählte Allergie beim gewählten Rezept:
+   - **Hinzufügen:** Ist sie bereits hinterlegt, erscheint eine Meldung; sonst wird sie mit `append()` ergänzt.
+   - **Entfernen:** Ist sie nicht hinterlegt, erscheint eine Meldung; sonst wird sie mit `remove()` entfernt. Durch die Prüfung vorher entsteht kein `ValueError`.
+6. Die Rezeptliste wird mit `save_recipes()` gespeichert.
+
+### Durchgeführte Tests
+
+- Mehrere Allergien hinzufügen; nur das gewählte Rezept wird verändert.
+- Bereits hinterlegte Allergie erneut hinzufügen → Meldung, kein Duplikat.
+- Nicht hinterlegte Allergie entfernen → Meldung, kein Programmabbruch.
+- Unbekannte Allergie (`Pizza`), leere Eingabe und `fertig` ohne Allergie werden abgelehnt.
+- Unterschiedliche Schreibweisen (`  gluten `, `LAKTOSE`) werden einheitlich gespeichert.
+
 ## 9. Weitere Entwicklungsschritte
 
 3. **Weitere User Storys:** Anzeige, Bearbeitung, Löschung, Skalierung, Einkaufsliste, Filter, Favoriten und Allergien nach Gruppenaufteilung integrieren.
