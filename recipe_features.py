@@ -7,7 +7,7 @@ def input_ingredients():
     stored_ingredients = []
 
     while True:
-        user_input = input("Nach welchen Zutaten suchst du? Wenn du fertig bist, bitte mit 'fertig' antworten.")
+        user_input = input("Gib die Zutaten ein, nach welchen du suchst. Wenn du fertig bist, bitte mit 'fertig' antworten.")
         user_input = user_input.strip().lower()
         if user_input == "fertig":
             if len(stored_ingredients) > 0:
@@ -19,7 +19,7 @@ def input_ingredients():
             stored_ingredients.append(user_input)
 
 
-def recipe_filter():
+def ingredient_filter():
     recipes = load_recipes()
     result = input_ingredients()
     filtered_recipe = []
@@ -99,55 +99,56 @@ def edit_favorites():
     save_recipes(recipes)
 
 
-def user_input1_allergies():
+def user_input_allergies():
     list_allergies = []
 
+    print(f"Das sind alle möglichen Allergien: {', '.join(allergies)}")
+
     while True:
-        user_input1 = input("Welche Allergien möchtest du hinzufügen oder entfernen? Wenn du fertig bist, bitte mit 'fertig' antworten.")
-        if user_input1.lower().strip() in [x.lower() for x in allergies] and user_input1.lower().strip().capitalize() not in list_allergies:
-            list_allergies.append(user_input1.lower().strip().capitalize())
-        elif user_input1.lower().strip() == "fertig":
+        user_input = input("Gib die Allergien an, nach welchen du filtern möchtest. Wenn du fertig bist, bitte mit 'fertig' antworten.")
+        if user_input.lower().strip() in [x.lower() for x in allergies]:
+            list_allergies.append(user_input.lower().strip().capitalize())
+        elif user_input.lower().strip() == "fertig":
             if len(list_allergies) > 0:
                 return list_allergies
             print("Bitte gib mind. eine Allergie ein.") #wenn user fertig schreibt, obwohl noch keine Zutat der Liste beigefügt wurde
-        elif user_input1.strip() == "": 
+        elif user_input.strip() == "": 
             print("Bitte gib eine Allergie mit mind. einem Buchstaben ein.")
-        elif user_input1.lower().strip().capitalize() in list_allergies:
+        elif user_input.lower().strip().capitalize() in list_allergies:
             print("Die Allergie ist bereits in der Liste vorhanden.")
         else:
             print("Die Allergie ist nicht in der Liste enthalten. Bitte überprüfe sie und versuche es noch einmal.")
 
 
-def user_input2_allergies(): #checkt nur user input2. Wenn ungültig wird wieder gefragt mithilfe while loop
-    while True:
-        user_input2 = input("Möchtest du die Allergie(n) entfernen oder hinzufügen? (Bitte mit 'entfernen' oder 'hinzufügen' antworten.)")
-        if user_input2.lower().strip() == "hinzufügen" or user_input2.lower().strip() == "entfernen":
-            return user_input2
-        print("Deine Eingabe ist ungültig. Bitte überprüfe sie und versuche es noch einmal.")
-
-
-def edit_allergies():
+def allergies_filter():
+    input_allergies = user_input_allergies() #Liste mit eingegebenen Allergien
     recipes = load_recipes()
-    print(f"Das sind alle möglichen Allergien: {allergies}")
-    for recipe in recipes:
-        print(f"Rezept: {recipe['name']}; ID: {recipe['id']}; Allergien: {recipe['allergies']}")
-    user_input1 = user_input1_favorites()
-    user_input2 = user_input1_allergies()
-    user_input3 = user_input2_allergies()
-    for recipe in recipes:
-        if int(user_input1) == recipe["id"] and user_input3.lower().strip() == "hinzufügen":
-            for allergy in user_input2:
-                if allergy in recipe["allergies"]:
-                    print(f"{allergy} ist bereits als Allergie hinterlegt.")
-                else:
-                    recipe["allergies"].append(allergy) #wir haben schon bei user_input2_allergies gecheckt ob 
-                    print(f"{allergy} wurde zu den Allergien von {recipe['name']} hinzugefügt.")
-        elif int(user_input1) == recipe["id"] and user_input3.lower().strip() == "entfernen":
-            for allergy in user_input2:  
-                if allergy not in recipe["allergies"]:
-                    print(f"{allergy} ist nicht als Allergie hinterlegt.")
-                else:
-                    recipe["allergies"].remove(allergy) #wir haben schon bei user_input2_allergies gecheckt ob die Allergie in der Liste ist
-                    print(f"{allergy} wurde von den Allergien von {recipe['name']} entfernt.")
 
-    save_recipes(recipes)
+    list_filteres_recipes = []
+    for recipe in recipes:
+        recipe_fits = True
+        for allergy in input_allergies:
+            if allergy in recipe["allergies"]:
+                recipe_fits = False
+
+        if recipe_fits == True:
+            list_filteres_recipes.append(recipe) #only appends recipes which do not have the listed allergies in them
+        
+    return list_filteres_recipes 
+  
+
+def recipe_filter():
+    recipe_allergies = allergies_filter()
+    ingredient_recipes = ingredient_filter()
+
+    filtered_recipes = []
+    for recipe in ingredient_recipes:
+        if recipe in recipe_allergies:
+            filtered_recipes.append(recipe)
+
+    if filtered_recipes == []:
+        print("Es wurden keine Rezepte gefunden.")
+    else:
+        print("Das sind deine gefilterten Rezepte: {', '.join([recipe['name'] for recipe in filtered_recipes])}")
+       
+    return filtered_recipes
