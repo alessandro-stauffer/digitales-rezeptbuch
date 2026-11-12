@@ -7,50 +7,51 @@ from storage import load_recipes
 # Tool: Rezepte speichern
 from storage import save_recipes
 
-def delete_recipe(recipes)
+def delete_recipe(recipes):
     recipes = load_recipes()
 
-    # Status Rezeptbuch ist leer (kopiert von recipe_display)
-        if not recipes:
-            print('\n--- keine Rezepte vorhanden ---\n')
-            return
+    # Status Rezeptbuch ist leer ()
+    if not recipes:
+        print('\n--- keine Rezepte vorhanden ---\n')
+        return
 
-        # vorhandene Rezepte (kopiert von recipe_display)
-        print('\n=== Deine Rezepte ===')
-        for i, recipe in enumerate (recipes):
-            print(i+1, recipe["name"])
+    # vorhandene Rezepte ()
+    print('\n=== Deine Rezepte ===')
+    for i, recipe in enumerate (recipes):
+        print(i+1, recipe["name"])
 
-        # Rezept fürs Löschen wählen
-        number = input('\nWähle Rezept-Nr. zum löschen: ')
+    # Rezept fürs Löschen wählen
+    number = input('\nWähle Rezept-Nr. zum löschen: ')
+
+# Prüfung int & Umwandlung Zahl ()
+    if number.isdigit():
+        number = int(number)
+
+        # Prüfung Rezeptliste Anz. ()
+        if 1 <= number <= len(recipes):
+            selected_recipe = recipes[number - 1]   
+
+                 
+
+
 
 
 # weiteres Vorgehen nachdem Rezept ausgewählt
 
  #def recipe_delete(decision,input):
-decision = input("Bist du dir ganz sicher, dass du das Rezept löschen möchtest? ").strip().lower()
-if decision == "j":
-    print("Alles klar, das Rezept wurde erfolgreich gelöscht !")
+#decision = input("Bist du dir ganz sicher, dass du das Rezept löschen möchtest? ").strip().lower()
+#if decision == "j":
+ #   print("Alles klar, das Rezept wurde erfolgreich gelöscht !")
 
-elif decision == "n":
-    print("Puuh, Glück gehabt, nichts ist gelöscht oder verloren :)")
+#elif decision == "n":
+ #   print("Puuh, Glück gehabt, nichts ist gelöscht oder verloren :)")
 
-else: print('Oh, tut mir Leid, ich habe deine Eingabe nicht verstanden - antworte am besten mit "j" oder "n" ;) ')
+#else: print('Oh, tut mir Leid, ich habe deine Eingabe nicht verstanden - antworte am besten mit "j" oder "n" ;) ')
 
 
 
 
  # Funktion Rezepte einfügen
-from recipe_management import add_recipe_id # die Rezept ID Auswahl
+#from recipe_management import add_recipe_id # die Rezept ID Auswahl
 
-def recipe_delete(recipes):
-    recipes = load_recipes() # Rezepte suchen
-    if not recipes:
-        return
-        print("Keine Rezepte gefunden.")
 
-    if True: 
-        return load_recipes()
-        print (add_recipe_id)
-    # rezept_ID = input ("Welches Rezept möchtest du löschen?")
-
-        
