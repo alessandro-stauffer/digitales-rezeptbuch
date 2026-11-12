@@ -14,7 +14,7 @@ def show_recipes():
         return
 
     # vorhandene Rezepte
-    print('\n === Deine Rezepte ===')
+    print('\n=== Deine Rezepte ===')
 
     # i = Startpunkt
     for i, recipe in enumerate (recipes):
@@ -44,6 +44,7 @@ def show_recipes():
                 print(f' - {ingredients['name']}: {ingredients['amount']} {ingredients['unit']}')
 
         # Fehleingaben
-        else: print(' \n--- kein Rezept gefunden --- \n(Eingabe ungültig: siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)')
+        else: print(' \n--- kein Rezept gefunden --- \n(Eingabe ungültig ! Siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)') # falsche Zahl
+    else: print ('\n--- kein Rezept gefunden ---\n(Eingabe ungültig ! Gib eine gültige Zahl ein)') # Buchstaben statt Zahl
 
-show_recipes()
+# Loop ? main.py oder display.py ?
