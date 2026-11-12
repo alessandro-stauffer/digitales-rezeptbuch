@@ -1,6 +1,3 @@
-# Tool: Herstellung Verbindung json
-import json 
-
 # Tool: Rezepte laden
 from storage import load_recipes
 
