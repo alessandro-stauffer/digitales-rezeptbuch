@@ -10,7 +10,7 @@ def show_recipes():
 
     # Status Rezeptbuch ist leer
     if not recipes:
-        print('\nKeine Rezepte vorhanden.\n')
+        print('\n--- keine Rezepte vorhanden ---\n')
         return
 
     # vorhandene Rezepte
@@ -21,4 +21,9 @@ def show_recipes():
 
          # +1 wegen Nummerierung ab 0
         print(i+1, recipe["name"])
-        
+
+        # Rezept öffnen
+        id = input('\nWähle Rezept-Nr.: ')
+
+print('\nWähle Rezept-Nr.: ')
+
