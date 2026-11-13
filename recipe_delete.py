@@ -7,7 +7,7 @@ from storage import load_recipes
 # Tool: Rezepte speichern
 from storage import save_recipes
 
-def delete_recipe(recipes):
+def delete_recipe():
     recipes = load_recipes()
 
     # Status Rezeptbuch ist leer ()
@@ -32,7 +32,7 @@ def delete_recipe(recipes):
             selected_recipe = recipes[number - 1]   
 
             # Sicherheitsfrage
-            decide = input(f'\n{selected_recipe['name']} wirklich löschen? (j/n): '):
+            decide = input(f'\n{selected_recipe['name']} wirklich löschen? (j/n): ')
             if decide.lower().strip() == "j":
 
                 # löschen über Position Liste
@@ -40,9 +40,15 @@ def delete_recipe(recipes):
                 save_recipes(recipes)
                 print('\n--- Rezept erfolgreich gelöscht --- \n')
             else: print ('\n--- Löschvorgang abgebrochen --- \n')
-        else: print ('\n--- kein Rezept gefunden --- \n')
-    else: print('\n--- kein Rezept gefunden ---\n')
 
+        # Fehleingaben ()
+        else: print ('\n--- kein Rezept gefunden --- \n(Eingabe ungültig ! Siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)\n')
+    else: print('\n--- kein Rezept gefunden ---\n(Eingabe ungültig ! Gib eine gültige Zahl ein)\n') 
+
+
+delete_recipe()
+
+# Fehlermeldung !! :(
 
 
 
