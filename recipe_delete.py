@@ -31,6 +31,21 @@ def delete_recipe(recipes):
         if 1 <= number <= len(recipes):
             selected_recipe = recipes[number - 1]   
 
+            # Sicherheitsfrage
+            decide = input(f'\n{selected_recipe['name']} wirklich löschen? (j/n): '):
+            if decide.lower().strip() == "j":
+
+                # löschen über Position Liste
+                recipe.pop(number -1)
+                save_recipes(recipes)
+                print('\n--- Rezept erfolgreich gelöscht --- \n')
+            else: print ('\n--- Löschvorgang abgebrochen --- \n')
+        else: print ('\n--- kein Rezept gefunden --- \n')
+    else: print('\n--- kein Rezept gefunden ---\n')
+
+
+
+
                  
 
 
