@@ -45,5 +45,34 @@
         "favorite": false,
         "allergies": [],
         "id": 3
+    },
+    {
+        "name": "Pizza Margherita",
+        "portions": 8,
+        "ingredients": [
+            {
+                "name": "Pizzateig",
+                "amount": 1.0,
+                "unit": "g"
+            },
+            {
+                "name": "Tomatensauce",
+                "amount": 250.0,
+                "unit": "ml"
+            },
+            {
+                "name": "Mozarella",
+                "amount": 250.0,
+                "unit": "g"
+            },
+            {
+                "name": "Parmesan",
+                "amount": 100.0,
+                "unit": "g"
+            }
+        ],
+        "favorite": false,
+        "allergies": [],
+        "id": 4
     }
 ]

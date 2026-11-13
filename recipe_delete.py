@@ -36,7 +36,7 @@ def delete_recipe():
             if decide.lower().strip() == "j":
 
                 # löschen über Position Liste
-                recipe.pop(number -1)
+                recipes.pop(number -1)
                 save_recipes(recipes)
                 print('\n--- Rezept erfolgreich gelöscht --- \n')
             else: print ('\n--- Löschvorgang abgebrochen --- \n')
@@ -44,35 +44,5 @@ def delete_recipe():
         # Fehleingaben ()
         else: print ('\n--- kein Rezept gefunden --- \n(Eingabe ungültig ! Siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)\n')
     else: print('\n--- kein Rezept gefunden ---\n(Eingabe ungültig ! Gib eine gültige Zahl ein)\n') 
-
-
-delete_recipe()
-
-# Fehlermeldung !! :(
-
-
-
-                 
-
-
-
-
-# weiteres Vorgehen nachdem Rezept ausgewählt
-
- #def recipe_delete(decision,input):
-#decision = input("Bist du dir ganz sicher, dass du das Rezept löschen möchtest? ").strip().lower()
-#if decision == "j":
- #   print("Alles klar, das Rezept wurde erfolgreich gelöscht !")
-
-#elif decision == "n":
- #   print("Puuh, Glück gehabt, nichts ist gelöscht oder verloren :)")
-
-#else: print('Oh, tut mir Leid, ich habe deine Eingabe nicht verstanden - antworte am besten mit "j" oder "n" ;) ')
-
-
-
-
- # Funktion Rezepte einfügen
-#from recipe_management import add_recipe_id # die Rezept ID Auswahl
 
 
