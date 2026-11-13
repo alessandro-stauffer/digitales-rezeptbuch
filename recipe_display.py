@@ -42,11 +42,10 @@ def show_recipes():
             print("Zutaten")
             for ingredients in selected_recipe['ingredients']:
                 print(f' - {ingredients['name']}: {ingredients['amount']} {ingredients['unit']}')
+            print()
 
         # Fehleingaben
         else: print(' \n--- kein Rezept gefunden --- \n(Eingabe ungültig ! Siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)\n') # falsche Zahl
     else: print ('\n--- kein Rezept gefunden ---\n(Eingabe ungültig ! Gib eine gültige Zahl ein)\n') # Buchstaben statt Zahl
 
 # Loop ? main.py oder display.py ?
-
-show_recipes()
