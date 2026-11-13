@@ -3,6 +3,33 @@ from storage import save_recipes
 
 allergies = ["Gluten", "Laktose", "Nüsse", "Eier", "Soja", "Sesam", "Krebstiere", "Weichtiere"]
 
+def ask_recipe_allergies():
+    list_allergies = []
+ 
+    print("Das sind alle möglichen Allergien:")
+    number = 1
+    for allergy in allergies:
+        print(f"{number}: {allergy}")
+        number += 1
+ 
+    valid_input = [str(x) for x in range(1, len(allergies)+1)]
+ 
+    while True: #while loop damit immer wieder nach Input gefragt wird. while loop wird beendet sobald etwas returned wird
+        user_input = input("Allergie auswählen (1-8 oder fertig): ").strip()
+        if user_input.lower() == "fertig":
+            return list_allergies
+        elif user_input == "":
+            print("Bitte gib eine Nummer ein.")
+        elif user_input not in valid_input:
+            print(f"Ungültige Eingabe. Bitte eine Nummer zwischen 1 und {len(allergies)} eingeben.")
+        else:
+            allergy = allergies[int(user_input) - 1]
+            if allergy in list_allergies:
+                print(f"{allergy} ist bereits in der Liste vorhanden.")
+            else:
+                list_allergies.append(allergy)
+                print(f"{allergy} wurde hinzugefügt.")
+
 def input_ingredients():
     stored_ingredients = []
 

@@ -19,6 +19,8 @@ def load_recipes():
 
     return recipes
 
+# Funktion wurde aufgrund des Feedbacks von Dr. Härer
+# während der Prüfung der User Stories erstellt.
 def import_recipe(file_path):
     try:
         with open(file_path, "r", encoding="utf-8") as file:

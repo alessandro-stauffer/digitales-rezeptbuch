@@ -10,7 +10,15 @@ def create_recipe():
     recipe = add_recipe_id(recipe, recipes)
     recipes.append(recipe)
     save_recipes(recipes)
-    print(recipes)
+    print(f"Rezept: {recipe['name']}")
+    print(f"Portionen: {recipe['portions']}")
+    print("Zutaten:")
+    for ingredient in recipe["ingredients"]:
+        print(f"- {ingredient['amount']} {ingredient['unit']} {ingredient['name']}")
+    print("Allergien:")
+    for allergie in recipe["allergies"]:
+        print(f"- {allergie}")
+
 
 def import_new_recipe(file_path):
     recipes = load_recipes()
