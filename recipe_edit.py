@@ -60,7 +60,11 @@ def edit_recipe():
         elif choice == "3":
             for index in range(len(recipe['ingredients'])):
                 ingredient = recipe['ingredients'][index]
-                print(f"index+4 {ingredient['amount']} {ingredient['unit']} {ingredient['name']}")
+                print(f"index+4 {ingredient['amount']} {ingredient['unit']} {ingredient['name']}") # Print stimmt nicht!
+
+            ingredient_choice = input("\nWähle Zutat-Nr: ")-1
+            
+
             
 
 
