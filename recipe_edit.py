@@ -50,9 +50,21 @@ def edit_recipe():
             print("\n--- Der Rezeptname wurde erfolgreich aktualisiert. ---\n")
 
         # Änderung Anzahl Portionen
-        if choice == "2":
-            recipe['portion'] = input('KORREKTUR Anzahl Portionen: ')
+        elif choice == "2":
+            recipe['portions'] = input('NEUE Anzahl Portionen: ')
+            recipe['portions'] = int(recipe['portions'])
+            save_recipes(recipes)
             print('\n--- Die Anzahl Portionen wurde erfolgreich korrigiert. ---\n')
+
+        # Änderung Zutaten
+        elif choice == "3":
+            for index in range(len(recipe['ingredients'])):
+                ingredient = recipe['ingredients'][index]
+                print(f"index+4 {ingredient['amount']} {ingredient['unit']} {ingredient['name']}")
+            
+
+
+
 
 
 

@@ -74,5 +74,34 @@
         "favorite": false,
         "allergies": [],
         "id": 4
+    },
+    {
+        "name": "Hörnli mit Gehacktem",
+        "portions": 4,
+        "ingredients": [
+            {
+                "name": "Hackfleisch",
+                "amount": 500.0,
+                "unit": "g"
+            },
+            {
+                "name": "Hörnli",
+                "amount": 500.0,
+                "unit": "g"
+            },
+            {
+                "name": "Wasser",
+                "amount": 500.0,
+                "unit": "ml"
+            },
+            {
+                "name": "Pfeffer",
+                "amount": 1.0,
+                "unit": "g"
+            }
+        ],
+        "favorite": false,
+        "allergies": [],
+        "id": 5
     }
 ]
