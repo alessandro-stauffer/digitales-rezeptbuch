@@ -16,7 +16,16 @@ def edit_recipe():
             print(f"{recipe['id']} {recipe['name']}")
         print()
 
-        select_id = input("Wähle Rezept-Nr.: ")
+        select_id = int(input("Wähle Rezept-Nr.: ")) # Prüfung Fehlermeldung
+       
+    
+        for recipe in recipes
+            if select_id == recipe['id']
+
+        # Detailansicht, wird wegen Mehrfachbrauch noch in eine Funktion umgewandelt
+        print('\n--- Rezeptdetails ---')
+        print(f"{recipe['name']}")
+              
 
 
 
