@@ -14,17 +14,24 @@ def edit_recipe():
         print('\n=== Deine Rezepte ===')
         for recipe in recipes:
             print(f"{recipe['id']} {recipe['name']}")
-        print()
+        print('\n--- Rezeptdetails ---')
 
-        select_id = int(input("Wähle Rezept-Nr.: ")) # Prüfung Fehlermeldung
-       
-    
-        for recipe in recipes
-            if select_id == recipe['id']
+        select_id = input("Wähle Rezept-Nr.: ") # Prüfung Fehlermeldung
+        select_id = int(select_id)
+                
+        for recipe in recipes:
+            if select_id == recipe['id']:
+                break
 
         # Detailansicht, wird wegen Mehrfachbrauch noch in eine Funktion umgewandelt
-        print('\n--- Rezeptdetails ---')
-        print(f"{recipe['name']}")
+        print(f"\n--- {recipe['name']} ---")
+        print(f"(Rezept für {recipe['portions']} Portionen)")
+        print(f"\nZutaten:")
+        print(f"- {ingredients['amount']} {ingredients['unit']} {ingredients['name']}")
+        
+
+
+
               
 
 
