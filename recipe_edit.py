@@ -28,24 +28,18 @@ def edit_recipe():
         print(f"(Rezept für {recipe['portions']} Portionen)")
         print(f"\nZutaten:")
         for ingredient in recipe['ingredients']:
-            print(f"- {ingredient['amount']} {ingredient['unit']} {ingredient['name']}") #schon wieder Fehlermeldung !!!! - Fehler behoben :)
+            print(f"- {ingredient['amount']} {ingredient['unit']} {ingredient['name']}") 
         
         print('\nDetail bearbeiten:')
         print(f"(1) Rezeptname: {recipe['name']}")
         print(f"(2) Portionen: {recipe['portions']}")
-        print(f"(3) Zutaten: {ingredient['name']}")
-        
-
-
-
-
-
+        print(f"(3) Zutaten bearbeiten")
+        for index in range(len(recipe['ingredients'])):
+            ingredient = recipe['ingredients'][index]
 
 
         
-
-        selected_details = input("\n Detail zu bearbeiten: ")
-        print(f"(1) {recipe['name']}")
+       
 
 
 
