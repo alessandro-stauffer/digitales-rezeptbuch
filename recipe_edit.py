@@ -2,6 +2,7 @@
 import json
 
 from storage import load_recipes
+from storage import save_recipes
 
 def edit_recipe():
     recipes = load_recipes()
@@ -34,11 +35,32 @@ def edit_recipe():
         print(f"(1) Rezeptname: {recipe['name']}")
         print(f"(2) Portionen: {recipe['portions']}")
         print(f"(3) Zutaten bearbeiten")
-        for index in range(len(recipe['ingredients'])):
-            ingredient = recipe['ingredients'][index]
+
+     #   for index in range(len(recipe['ingredients'])):
+      #      ingredient = recipe['ingredients'][index]
+       #     for 
+        #        print(f"{recipe['ingredients'][index]}") # hier stimmt was nicht
+
+        # Änderung Rezeptname
+        choice = input("\nWähle Detail-Nr.: ")
+        print()
+        if choice == "1":
+            recipe['name'] = input("NEUER Rezeptname: ")
+            save_recipes(recipes)
+            print("\n--- Der Rezeptname wurde erfolgreich aktualisiert. ---\n")
 
 
-        
+
+
+    #    elif choice == "2"
+     #       edit = input("neue Portionenzahl: ")
+      #      print("Die Portionen wurde erfolgreich aktualisiert.")
+
+
+
+
+
+
        
 
 
