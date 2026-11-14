@@ -49,6 +49,12 @@ def edit_recipe():
             save_recipes(recipes)
             print("\n--- Der Rezeptname wurde erfolgreich aktualisiert. ---\n")
 
+        # Änderung Portionen
+        if choice == "2":
+            recipe['portion'] = input('KORREKTUR Anzahl Portionen: ')
+            print('\n--- Die Anzahl Portionen wurde erfolgreich korrigiert. ---\n')
+
+
 
 
 
