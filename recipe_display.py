@@ -49,3 +49,4 @@ def show_recipes():
     else: print ('\n--- kein Rezept gefunden ---\n(Eingabe ungültig ! Gib eine gültige Zahl ein)\n') # Buchstaben statt Zahl
 
 # Loop ? main.py oder display.py ?
+# Ansicht nochmals anpassen - aber zuerst gemeinsamer Test am Mo

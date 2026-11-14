@@ -45,4 +45,4 @@ def delete_recipe():
         else: print ('\n--- kein Rezept gefunden --- \n(Eingabe ungültig ! Siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)\n')
     else: print('\n--- kein Rezept gefunden ---\n(Eingabe ungültig ! Gib eine gültige Zahl ein)\n') 
 
-
+# Anzeige nachträglich nochmal anpassen, aber zuerst gemeinsamer Funktionstest am Mo

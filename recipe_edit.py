@@ -14,8 +14,8 @@ def edit_recipe():
         print('\n=== Deine Rezepte ===')
         for recipe in recipes:
             print(f"{recipe['id']} {recipe['name']}")
+        
         print('\n--- Rezeptdetails ---')
-
         select_id = input("Wähle Rezept-Nr.: ")
         select_id = int(select_id)
                 
@@ -29,7 +29,24 @@ def edit_recipe():
         print(f"\nZutaten:")
         for ingredient in recipe['ingredients']:
             print(f"- {ingredient['amount']} {ingredient['unit']} {ingredient['name']}") #schon wieder Fehlermeldung !!!! - Fehler behoben :)
-        print()
+        
+        print('\nDetail bearbeiten:')
+        print(f"(1) Rezeptname: {recipe['name']}")
+        print(f"(2) Portionen: {recipe['portions']}")
+        print(f"(3) Zutaten: {ingredient['name']}")
+        
+
+
+
+
+
+
+
+        
+
+        selected_details = input("\n Detail zu bearbeiten: ")
+        print(f"(1) {recipe['name']}")
+
 
 
 
