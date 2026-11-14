@@ -58,12 +58,19 @@ def edit_recipe():
 
         # Änderung Zutaten
         elif choice == "3":
+            print("Zutat bearbeiten:")
             for index in range(len(recipe['ingredients'])):
                 ingredient = recipe['ingredients'][index]
-                print(f"index+4 {ingredient['amount']} {ingredient['unit']} {ingredient['name']}") # Print stimmt nicht!
+                print(f"({index+4}) {ingredient['amount']} {ingredient['unit']} {ingredient['name']}")
 
-            ingredient_choice = input("\nWähle Zutat-Nr: ")-1
-            
+            ingredient_choice = input("\nWähle Zutat-Nr: ")
+            ingredient_choice = int(ingredient_choice)-1
+            if choice == "4":
+                ingredient['name'] = input("Zutat ändern: ")
+                save_recipes()
+                print('\n --- Zutat wurde erfolgreich geändert. ---\n')
+
+
 
             
 
