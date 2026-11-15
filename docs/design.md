@@ -4,7 +4,7 @@
 
 Das Projekt ist eine lokale Python-Kommandozeilenanwendung (CLI), mit der Benutzer Rezepte erfassen, speichern, anzeigen, bearbeiten und verwalten können. Die Anwendung wird von vier Gruppenmitgliedern gemeinsam entwickelt. Die einzelnen Funktionen werden auf mehrere Python-Module verteilt.
 
-**Dokumentationsstand:** Die grundlegende Rezepterfassung (US01) und die dazu benötigten Eingabeprüfungen (US09) sind implementiert und manuell getestet. Weitere User Storys und die Integration in das gemeinsame Hauptmenü sind noch in Entwicklung. Die nachfolgend beschriebenen Funktionen werden als *implementiert* oder *geplant* gekennzeichnet.
+**Dokumentationsstand (November 2026):** Die Rezepterfassung (US01), der Rezeptimport (US02) und die Eingabe-/Importvalidierung (US09) sind implementiert und manuell getestet. Die Rückmeldungen des Dozenten wurden in den Eingabeaufforderungen, der Ausgabe nach der Rezepterfassung und der Allergieauswahl berücksichtigt. Das Hauptmenü ist vorhanden und startet bereits Rezepterfassung, Rezeptimport, eine einfache Rezeptliste, Skalierung und Einkaufsliste; weitere Menüpunkte sind noch Platzhalter. Weitere Funktionen sind in separaten Modulen vorhanden, aber nicht alle mit dem Hauptmenü verbunden. Als Quelle für den dokumentierten Implementierungsstand dient der hochgeladene Projektstand; nicht integrierte Teile werden ausdrücklich als solche bezeichnet.
 
 ## 2. Datenmodell
 
@@ -21,9 +21,9 @@ Alle Rezepte werden während der Programmausführung in einer Liste (`list`) ver
 | `favorite` | `bool` | Kennzeichnung als Favorit |
 | `allergies` | `list` | Liste zugeordneter Allergietypen |
 
-Neue Rezepte erhalten standardmässig `favorite = False` und eine leere Allergienliste `[]`. Favoriten und Allergien werden in anderen User Storys weiterbearbeitet.
+Bei der **manuellen Rezepterfassung** wird `favorite = False` gesetzt; `allergies` enthält die vom Benutzer über eine nummerierte Liste ausgewählten Allergien oder `[]`, wenn die Auswahl mit `fertig` ohne Eintrag beendet wird. Beim **JSON-Import** werden `favorite = False` und `allergies = []` gesetzt, da die Importdatei nur Name, Portionen und Zutaten liefern muss. Die Favoritenverwaltung und Allergiefilterung befinden sich in `recipe_features.py`.
 
-Beispiel eines neu erfassten Rezepts:
+Beispiel eines manuell erfassten Rezepts mit ausgewählten Allergien:
 
 ```python
 {
@@ -35,7 +35,7 @@ Beispiel eines neu erfassten Rezepts:
         {"name": "Milch", "amount": 200.0, "unit": "ml"}
     ],
     "favorite": False,
-    "allergies": []
+    "allergies": ["Gluten", "Laktose"]
 }
 ```
 
@@ -46,7 +46,7 @@ Jede Zutat wird ebenfalls als Dictionary dargestellt.
 | Feld | Datentyp | Beschreibung |
 |---|---|---|
 | `name` | `str` | Name der Zutat; darf nicht leer sein |
-| `amount` | `float` | Endliche, positive Menge, grösser als 0 |
+| `amount` | `float` (manuelle Eingabe); `int` oder `float` (JSON-Import) | Endliche, positive Menge, grösser als 0 |
 | `unit` | `str` | Einheit der Zutat |
 
 Zulässige Einheiten in der aktuellen Umsetzung: `g`, `ml`, `Stück`. Die Eingabe wird derzeit auf diese exakten Schreibweisen geprüft.
@@ -72,13 +72,15 @@ Die dauerhafte Speicherung erfolgt lokal in der JSON-Datei `data/recipes.json`.
 
 ## 4. Grundprinzipien
 
-- Eingabe, Verarbeitung und Ausgabe werden möglichst getrennt.
-- Eine Funktion soll eine klar definierte Aufgabe erfüllen.
+- Eingabe, Verarbeitung und Ausgabe werden möglichst getrennt; `recipe_input.py` vereint derzeit Eingabe, Ablaufkoordination und die Ausgabe des neu erfassten Rezepts.
+- Eine Funktion soll eine klar definierte Aufgabe erfüllen; vorhandene Funktionen werden wiederverwendet.
 - Die Module verwenden das gemeinsame Datenmodell.
+- Eingaben der manuellen Rezepterfassung werden als **Aufforderungen statt Fragen** formuliert, zum Beispiel `Rezeptname eingeben: `. Hinter dem Doppelpunkt steht ein Leerzeichen vor der Eingabe.
 - Ungültige Benutzereingaben sollen keinen Programmabbruch verursachen, sondern erneut abgefragt werden.
 - Rezeptänderungen werden dauerhaft gespeichert.
 - Beschädigte gespeicherte Daten dürfen nicht stillschweigend überschrieben werden.
-- Gemeinsame Funktionen sollen durch andere Module wiederverwendbar sein.
+- Die Allergiezuordnung gehört zur manuellen Rezepterfassung (US01), nicht mehr zu einer separat zu entwickelnden User Story. Bestehende Allergiefilter-Funktionen bleiben erhalten.
+- Änderungen werden auf separaten Git-Branches entwickelt und erst nach Kontrolle per Pull Request in `main` übernommen.
 
 ## 5. Getroffene und offene Entscheidungen
 
@@ -87,18 +89,22 @@ Die dauerhafte Speicherung erfolgt lokal in der JSON-Datei `data/recipes.json`.
 - Ein Rezept muss mindestens eine Zutat enthalten.
 - Die aktuell erlaubten Einheiten sind `g`, `ml` und `Stück`.
 - Rezept-IDs werden nach der Regel *höchste vorhandene ID + 1* vergeben; bei leerer Liste beginnt die Zählung bei 1.
-- Neue Rezepte erhalten `favorite = False` und `allergies = []`.
+- Bei manueller Erfassung wird `favorite = False` gesetzt und die Allergien werden direkt abgefragt; der Benutzer darf auch keine Allergien auswählen.
+- Beim Import werden `favorite = False` und `allergies = []` vergeben. Im gespeicherten Rezept werden nur die vorgesehenen Felder auf **Rezept-Ebene** übernommen; die Zutaten-Dictionaries bleiben bei der Übernahme unverändert.
 - Eine fehlende `data/recipes.json` führt beim Laden zu einer leeren Rezeptliste.
-- Eine JSON-Datei mit ungültigem Inhalt verursacht eine Fehlermeldung und einen Abbruch des aktuellen Ablaufs, damit sie nicht überschrieben wird.
+- Eine gespeicherte JSON-Datei mit ungültigem Inhalt verursacht eine Fehlermeldung und einen Abbruch des aktuellen Ablaufs, damit sie nicht überschrieben wird.
 - Die dauerhafte Datenspeicherung erfolgt über `storage.py`.
-- Zur Auswahl stehende Allergietypen: `Gluten`, `Laktose`, `Nüsse`, `Eier`, `Soja`, `Sesam`, `Krebstiere`, `Weichtiere` (US12).
+- Die Allergietypen lauten `Gluten`, `Laktose`, `Nüsse`, `Eier`, `Soja`, `Sesam`, `Krebstiere`, `Weichtiere` und sind in `recipe_features.py` definiert.
+- Die manuelle Allergieauswahl erfolgt über Nummern von 1 bis 8 und endet mit `fertig`.
 - Der Zutatenfilter (US08) zeigt nur Rezepte, die **alle** eingegebenen Zutaten enthalten. Der Vergleich ignoriert Gross-/Kleinschreibung, verlangt aber den exakten Zutatennamen (`mehl` findet `Mehl`, aber nicht `Dinkelmehl`).
+- Im bestehenden Kombinationsfilter `recipe_filter()` werden die Treffer aus Zutaten- und Allergiefilter geschnitten.
 
 ### 5.2 Noch offene Entscheidungen
 
 - Benötigt das Rezept zusätzlich ein Feld für Freitext/Kochanweisungen? (Noch nicht entschieden.)
-- Wie sollen Schreibfehler bei der Dateispeicherung und fehlerhafte Datenstrukturen in gültigem JSON behandelt werden?
+- Wie sollen Schreibfehler bei der Dateispeicherung und fehlerhafte Datenstrukturen in der **gespeicherten** Rezeptdatei (bei syntaktisch gültigem JSON) behandelt werden?
 - Sollen die Einheiten- und Ja/Nein-Eingaben später auch alternative Schreibweisen erlauben (z. B. `stück`, `J`)?
+- Wie werden die bereits vorhandenen, aber noch nicht verdrahteten Anzeige-, Lösch- und Filterfunktionen ins Hauptmenü integriert?
 
 ## 6. Modulstruktur
 
@@ -106,24 +112,27 @@ Das Programm ist in mehrere Python-Module aufgeteilt. Jedes Modul übernimmt ein
 
 ### 6.1 Modulübersicht und Verantwortlichkeiten
 
-| Modul | Aufgabe | User Story / Bezug | Verantwortlich |
+| Modul | Aktuelle Aufgabe | User Story / Bezug | Zuständigkeit im Team |
 |---|---|---|---|
-| `main.py` | Programmstart und Ablaufsteuerung; bisher `create_recipe()`, später Hauptmenü | US01 / US10 | US01-Integration: Alessandro; Hauptmenü: Agshayan |
-| `recipe_input.py` | Neue Rezepte und Zutaten interaktiv erfassen | US01 | Alessandro |
-| `validation.py` | Benutzereingaben überprüfen | US09 | Alessandro |
-| `storage.py` | Rezeptdaten laden und speichern; Importfunktion geplant | Gemeinsame Datenspeicherung / US02 | Alessandro / Team |
-| `recipe_management.py` | IDs für neue Rezepte vergeben; Anzeigen, Bearbeiten, Löschen geplant | US01 / US03–US05 | ID-Vergabe: Alessandro; weitere Verwaltung: Jennifer |
-| `recipe_tools.py` | Zutatenmengen skalieren und Einkaufslisten erstellen | US06, US07 | Agshayan |
-| `recipe_features.py` | Rezepte filtern, Favoriten und Allergien verwalten | US08, US11, US12 | Mai |
+| `main.py` | Programmstart und Hauptmenü (`show_menu()`, `main()`); Aufruf weiterer Funktionen; mehrere Menüoptionen noch Platzhalter | US10 / Integration | Agshayan / Team |
+| `recipe_input.py` | Eingabe von Rezeptnamen, Portionen und Zutaten; `ask_recipe()`, `create_recipe()` und `import_new_recipe()`; leserliche Ausgabe nach manueller Erfassung | US01, US02, Dozentenfeedback | Alessandro |
+| `validation.py` | Eingabe- und Rezeptimportvalidierung (`validate_import_recipe()`) | US09, US02 | Alessandro |
+| `storage.py` | Laden/Speichern der Rezeptliste und Einlesen/Prüfen einer Importdatei (`import_recipe()`) | Datenspeicherung, US02 | Alessandro / Team |
+| `recipe_management.py` | Eindeutige Rezept-IDs ermitteln und zuweisen | US01, US02 | Alessandro |
+| `recipe_tools.py` | Zutatenmengen skalieren und Einkaufslisten erzeugen | US06, US07 | Agshayan |
+| `recipe_features.py` | Allergieauswahl bei der Eingabe, Zutaten-/Allergiefilter und Favoritenverwaltung | US01 (Allergien), US08, US11 | Allergieauswahl: Mai, eingebunden von Alessandro; übrige Features: Mai |
+| `recipe_display.py` | `show_recipes()` zur Anzeige und Auswahl gespeicherter Rezepte; aktuell nicht über Menüpunkt 3 aufgerufen | US03 | Jennifer |
+| `recipe_delete.py` | `delete_recipe()` mit Bestätigung und Speicherung; aktuell nicht über Menüpunkt 5 aufgerufen | US05 | Jennifer |
 
 ### 6.2 Zusammenarbeit der Module
 
-- `main.py` koordiniert die Funktionen und ruft für US01 die Eingabe, ID-Vergabe und Speicherung auf.
-- `recipe_input.py` ruft die passenden Funktionen aus `validation.py` auf.
-- `recipe_management.py` ermittelt die nächste ID anhand bereits vorhandener Rezepte.
-- `storage.py` liest und schreibt die gemeinsame JSON-Rezeptliste.
-- Andere Module erhalten benötigte Daten über Parameter und Rückgabewerte.
-- Ein gemeinsames Hauptmenü ist geplant und noch nicht Teil der aktuell getesteten US01-Funktion.
+- `main.py` zeigt das Hauptmenü und ruft bei den Menüoptionen 1 und 2 die Funktionen `create_recipe()` bzw. `import_new_recipe()` aus `recipe_input.py` auf.
+- `recipe_input.py` verwendet die Prüfungen aus `validation.py` und ruft für die Allergieauswahl `ask_recipe_allergies()` aus `recipe_features.py` auf.
+- `create_recipe()` und `import_new_recipe()` liegen **nicht mehr in `main.py`**, sondern in `recipe_input.py`. Dort laden sie bestehende Daten, vergeben IDs über `recipe_management.py` und speichern über `storage.py`.
+- `recipe_features.py` verwendet `storage.py`, um bei Filtern und Favoriten die gespeicherten Rezepte zu laden bzw. zu aktualisieren.
+- `recipe_tools.py` stellt Skalierung und Einkaufsliste für die Menüpunkte 6 und 7 bereit.
+- Die Module `recipe_display.py` und `recipe_delete.py` enthalten eigene Funktionen. Im aktuellen Hauptmenü werden diese noch nicht aufgerufen.
+- Die Menüoptionen 4, 5, 8, 9 und 10 enthalten derzeit `pass` und führen noch keine Fachfunktion aus; Option 3 gibt lediglich eine nummerierte Namensliste aus.
 
 ### 6.3 Entwicklungsprinzipien
 
@@ -139,40 +148,39 @@ Das Programm ist in mehrere Python-Module aufgeteilt. Jedes Modul übernimmt ein
 
 Die Anwendung wird in kleine, wiederverwendbare Funktionen unterteilt. Die Übersicht unterscheidet die bereits implementierten Funktionen von geplanten Teilen.
 
-### 7.1 Implementierte Funktionen (US01 und verwendete US09-Funktionen)
+### 7.1 Im hochgeladenen Projektstand implementierte Funktionen
 
 | Modul | Funktion | Aufgabe |
 |---|---|---|
-| `main.py` | `create_recipe()` | Gesamten Ablauf von Laden bis Speichern koordinieren |
-| `recipe_input.py` | `ask_recipe()` | Rezeptdaten ohne ID erfassen und Dictionary erstellen |
-| `recipe_input.py` | `ask_recipe_name()` | Gültigen Rezeptnamen abfragen |
-| `recipe_input.py` | `ask_portions()` | Gültige Portionszahl abfragen |
-| `recipe_input.py` | `ask_ingredients()` | Eine oder mehrere Zutaten erfassen |
-| `recipe_input.py` | `ask_ingredient()` | Ein Zutaten-Dictionary erstellen |
-| `recipe_input.py` | `ask_ingredient_name()` | Gültigen Zutatennamen abfragen |
-| `recipe_input.py` | `ask_ingredient_amount()` | Gültige Menge abfragen |
-| `recipe_input.py` | `ask_ingredient_unit()` | Gültige Einheit abfragen |
-| `validation.py` | `validate_text()` | Nicht leeren Text erkennen (`bool`) |
-| `validation.py` | `validate_portions()` | Positive Ganzzahl oder `None` zurückgeben |
-| `validation.py` | `validate_amount()` | Positive, endliche Dezimalzahl oder `None` zurückgeben |
-| `validation.py` | `validate_unit()` | Erlaubte Einheit prüfen (`bool`) |
-| `validation.py` | `validate_yes_no()` | `j` → `True`, `n` → `False`, sonst `None` |
-| `recipe_management.py` | `generate_next_id(recipes)` | Nächste Rezept-ID berechnen |
-| `recipe_management.py` | `add_recipe_id(recipe, recipes)` | ID zum neuen Rezept-Dictionary hinzufügen |
-| `storage.py` | `load_recipes()` | Rezeptliste aus JSON laden |
-| `storage.py` | `save_recipes(recipes)` | Rezeptliste als JSON speichern |
+| `main.py` | `show_menu()`, `main()` | Menü anzeigen, Benutzereingabe entgegennehmen und vorhandene Menüpunkte steuern |
+| `recipe_input.py` | `create_recipe()` | Manuell erfasstes Rezept mit neuer ID speichern und leserlich ausgeben |
+| `recipe_input.py` | `import_new_recipe(file_path)` | Gültige Importdaten übernehmen, ID/Standardfelder ergänzen und speichern |
+| `recipe_input.py` | `ask_recipe()` | Rezeptdaten ohne ID inklusive Allergieauswahl erfassen |
+| `recipe_input.py` | `ask_recipe_name()`, `ask_portions()` | Rezeptname und Portionszahl mit Validierung erfassen |
+| `recipe_input.py` | `ask_ingredients()`, `ask_ingredient()` | Zutatenliste und einzelne Zutat erfassen |
+| `recipe_input.py` | `ask_ingredient_name()`, `ask_ingredient_amount()`, `ask_ingredient_unit()` | Zutatenfelder mit Validierung erfassen |
+| `recipe_features.py` | `ask_recipe_allergies()` | Allergien nummeriert auswählen; Mehrfachnennung verhindern; Abschluss mit `fertig` |
+| `validation.py` | `validate_text()`, `validate_portions()`, `validate_amount()` | Text sowie positive Portionen/Mengen überprüfen |
+| `validation.py` | `validate_unit()`, `validate_yes_no()` | Erlaubte Einheiten und `j`/`n` prüfen |
+| `validation.py` | `validate_import_recipe(recipe)` | Struktur und Pflichtwerte eines JSON-Rezepts überprüfen |
+| `recipe_management.py` | `generate_next_id(recipes)`, `add_recipe_id(recipe, recipes)` | Eindeutige ID berechnen und vergeben |
+| `storage.py` | `load_recipes()`, `save_recipes(recipes)`, `import_recipe(file_path)` | Gespeicherte Rezepte laden/sichern, Importdatei einlesen und validieren |
+| `recipe_tools.py` | `scale_recipe()`, `create_shopping_list()` | Mengen skalieren und Einkaufsliste erstellen |
+| `recipe_features.py` | `input_ingredients()`, `ingredient_filter()` | Suchzutaten erfassen und passende Rezepte ermitteln |
+| `recipe_features.py` | `user_input_allergies()`, `allergies_filter()`, `recipe_filter()` | Allergien für die Filterung erfassen, Rezepte ausschliessen und Filter kombinieren |
+| `recipe_features.py` | `user_input1_favorites()`, `user_input2_favorites()` | ID und Favoritenaktion abfragen |
+| `recipe_features.py` | `get_favorites()`, `edit_favorites()` | Favoriten anzeigen, setzen und entfernen |
+| `recipe_display.py` | `show_recipes()` | Rezepte auflisten und Details eines ausgewählten Rezepts zeigen; noch nicht im Menü verdrahtet |
+| `recipe_delete.py` | `delete_recipe()` | Rezept mit Bestätigung löschen; noch nicht im Menü verdrahtet |
 
-### 7.2 Geplante weitere Funktionen
+### 7.2 Noch nicht integrierte oder offene Funktionen
 
-| Modul | Geplante Funktionen / Aufgaben |
-|---|---|
-| `main.py` | `main()`, `show_menu()`, `process_choice()` – gemeinsames Hauptmenü und Steuerung |
-| `storage.py` | Importfunktion für US02; genauer Name und Format noch offen |
-| `recipe_management.py` | `show_recipes()`, `edit_recipe()`, `delete_recipe()` |
-| `recipe_tools.py` | `scale_recipe()`, `create_shopping_list()` |
-| `recipe_features.py` | Umgesetzt, siehe Abschnitte US08, US11 und US12 |
+- `main.py`: Menüoptionen 4 (Bearbeiten), 5 (Löschen), 8 (Zutatenfilter), 9 (Favoriten) und 10 (Allergien) sind noch `pass`-Platzhalter.
+- `main.py`: Bei Option 3 wird eine einfache nummerierte Namensliste ausgegeben. Die bereits vorhandene Detailfunktion `show_recipes()` aus `recipe_display.py` ist noch nicht verbunden.
+- `recipe_management.py`: Die Bearbeitung von Rezepten ist im hochgeladenen Stand dort noch nicht implementiert.
+- `recipe_features.py`: Eine eigenständige nachträgliche Allergiebearbeitung (`edit_allergies()`) ist im hochgeladenen Code **nicht vorhanden**. Die Allergieauswahl ist stattdessen direkt in US01 integriert; die Allergiefilterung ist separat vorhanden.
 
-Die geplanten Funktionsnamen bleiben vorläufig, bis die jeweiligen User Storys umgesetzt und im Team integriert sind.
+Funktionsnamen und Aufgaben weiterer Umsetzungen werden erst nach tatsächlicher Implementierung verbindlich dokumentiert.
 
 ### 7.3 Grundsätze
 
@@ -185,35 +193,36 @@ Die geplanten Funktionsnamen bleiben vorläufig, bis die jeweiligen User Storys 
 
 ### 8.1 Programmstart
 
-**Geplant für die Gesamtanwendung:**
+1. Beim direkten Start von `main.py` wird durch `if __name__ == "__main__":` die Funktion `main()` aufgerufen.
+2. `main()` zeigt mit `show_menu()` das Hauptmenü an.
+3. Die gespeicherten Rezepte werden nicht pauschal beim Programmstart, sondern bei Bedarf durch die jeweilige Menüfunktion mit `load_recipes()` geladen.
+4. Die Menüsteuerung läuft in einer `while True`-Schleife, bis der Benutzer `0` auswählt.
 
-1. Das Programm wird gestartet.
-2. Bereits gespeicherte Rezepte werden aus der JSON-Datei geladen.
-3. Das Hauptmenü wird angezeigt.
+**Aktuell implementiert:** Hauptmenü mit funktionsfähigen Aufrufen für Rezepterfassung (1), Import (2), einfache Rezeptliste (3), Skalierung (6) und Einkaufsliste (7). Nicht alle übrigen Optionen sind integriert.
 
-**Aktuell implementiert:** `main.py` definiert die Funktion `create_recipe()`. Die Rezepterfassung startet erst, wenn diese Funktion aufgerufen wird; das spätere Hauptmenü ist noch nicht integriert.
+### 8.2 Menüsteuerung (teilweise implementiert)
 
-### 8.2 Menüsteuerung (geplant)
-
-1. Der Benutzer gibt eine Menüauswahl ein.
-2. Die Eingabe wird geprüft.
-3. Bei ungültiger Auswahl erscheint eine Fehlermeldung.
-4. Bei gültiger Auswahl wird die entsprechende Funktion ausgeführt.
-5. Nach Abschluss einer Funktion wird das Hauptmenü erneut angezeigt.
-6. Dieser Ablauf wiederholt sich, bis der Benutzer das Programm beendet.
+1. `show_menu()` zeigt die Optionen `0` bis `10` an.
+2. `main()` liest die Auswahl mit `input("Wähle eine Option: ")` ein.
+3. `0` beendet die Schleife.
+4. `1` ruft `create_recipe()` aus `recipe_input.py` auf; `2` fordert einen Dateipfad an und ruft `import_new_recipe(file_path)` auf.
+5. `3` lädt die Rezeptliste und gibt Nummer und Rezeptname aus (noch ohne Aufruf von `recipe_display.show_recipes()`).
+6. `6` und `7` laden die Rezepte, lassen eine Rezeptnummer auswählen und rufen `scale_recipe()` bzw. `create_shopping_list()` auf.
+7. `4`, `5`, `8`, `9`, `10` sind derzeit mit `pass` vorgesehen. Nicht aufgeführte Auswahlen erhalten die Meldung „Diese Option ist nicht verfügbar.“
+8. Danach wird das Menü erneut angezeigt.
 
 ### 8.3 Datenänderungen
 
 - Beim Erfassen, Bearbeiten oder Löschen von Rezepten werden Rezeptdaten geändert.
-- Änderungen an Favoriten und Allergien sollen ebenfalls gespeichert werden.
+- Änderungen an Favoriten werden in `recipe_features.py` gespeichert; Allergien werden bei der manuellen Rezepterfassung ausgewählt und zusammen mit dem Rezept gespeichert.
 - Die Daten werden nach erfolgreichen Änderungen in die JSON-Datei geschrieben.
-- Die geplante Skalierung von Zutaten soll das ursprüngliche Rezept nicht verändern.
+- Die implementierte Skalierung erstellt ein neues Rezept-Dictionary und eine neue Zutatenliste, ohne die gespeicherten Rezeptmengen zu verändern.
 
 ### 8.4 Kontrollstrukturen
 
 - `if`, `elif`, `else`: Entscheidungen und Eingabeprüfung
-- `while`: Wiederholung ungültiger Eingaben und mehrerer Zutaten; später Hauptmenü
-- `for`: Durchlaufen von Rezepten bei der Ermittlung der höchsten ID und weitere Listenverarbeitung
+- `while`: Wiederholung ungültiger Eingaben, mehrerer Zutaten, der Allergieauswahl und des Hauptmenüs
+- `for`: Durchlaufen von Zutaten, Allergien und Rezepten (Ausgabe, Filterung und ID-Vergabe)
 - `try`, `except`, `raise`: Behandlung von Eingabe- und Dateifehlern
 
 ### 8.5 Fehlerbehandlung
@@ -260,7 +269,7 @@ Ungültige Benutzereingaben werden verständlich gemeldet und erneut abgefragt. 
 
 **Ablauf:**
 
-1. `ask_portions()` fragt nach der Portionszahl.
+1. `ask_portions()` fordert die Portionszahl mit `Anzahl Portionen eingeben: ` an.
 2. `validate_portions()` versucht, die Eingabe mit `int()` umzuwandeln.
 3. Bei `ValueError` oder einer Zahl kleiner oder gleich 0 wird `None` zurückgegeben.
 4. Bei einer positiven Ganzzahl wird der Integer zurückgegeben.
@@ -289,7 +298,7 @@ Ungültige Benutzereingaben werden verständlich gemeldet und erneut abgefragt. 
 1. `ask_ingredient_name()` fragt nach dem Zutatennamen; `validate_text()` überprüft die Eingabe.
 2. `ask_ingredient_amount()` fragt nach der Menge; `validate_amount()` versucht die Umwandlung mit `float()` und akzeptiert nur endliche Werte grösser als 0. Dazu wird `math.isfinite()` verwendet.
 3. `ask_ingredient_unit()` fragt nach der Einheit; `validate_unit()` prüft, ob sie in der Liste der zulässigen Einheiten enthalten ist.
-4. Jede ungültige Teilangabe führt zu einer Fehlermeldung und einer erneuten Frage nach genau dieser Angabe.
+4. Jede ungültige Teilangabe führt zu einer Fehlermeldung und einer erneuten Aufforderung für genau diese Angabe.
 5. `ask_ingredient()` erstellt und gibt ein Dictionary mit den Schlüsseln `name`, `amount` und `unit` zurück.
 
 #### 8.8.2 Mehrere Zutaten erfassen
@@ -299,9 +308,9 @@ Ungültige Benutzereingaben werden verständlich gemeldet und erneut abgefragt. 
 1. Eine leere Zutatenliste `ingredients` wird erstellt.
 2. Eine äussere `while`-Schleife erfasst mindestens eine Zutat mit `ask_ingredient()`.
 3. Das Zutaten-Dictionary wird mit `ingredients.append(ingredient)` ergänzt.
-4. Der Benutzer wird gefragt, ob er eine weitere Zutat hinzufügen möchte (`j`/`n`).
+4. Der Benutzer wird mit `Weitere Zutat hinzufügen (j/n): ` aufgefordert, sich für eine weitere Zutat zu entscheiden.
 5. `validate_yes_no()` gibt bei `j` `True`, bei `n` `False`, sonst `None` zurück.
-6. Eine innere `while`-Schleife wiederholt die Ja/Nein-Frage, solange das Ergebnis `None` ist.
+6. Eine innere `while`-Schleife wiederholt die Ja/Nein-Eingabeaufforderung, solange das Ergebnis `None` ist.
 7. Bei `True` wird eine weitere Zutat erfasst. Bei `False` endet die äussere Schleife.
 8. Die vollständige Zutatenliste wird zurückgegeben.
 
@@ -322,237 +331,266 @@ Ungültige Benutzereingaben werden verständlich gemeldet und erneut abgefragt. 
 
 ### 8.9 Control Flow – US01 Rezept erstellen und speichern (implementiert)
 
-**Ziel:** Die gültig erfassten Rezeptdaten zu einem vollständigen Rezept zusammenführen, eine ID vergeben und die Rezeptliste dauerhaft speichern.
+**Ziel:** Gültige Rezeptdaten samt Allergieauswahl zu einem vollständigen Rezept zusammenführen, eine ID vergeben, dauerhaft speichern und nach der Erfassung übersichtlich ausgeben.
 
 **Zuständige Module:**
 
-- `main.py`: `create_recipe()` – Ablaufsteuerung
-- `recipe_input.py`: `ask_recipe()` – Datenerfassung und Rezept-Dictionary ohne ID
-- `recipe_management.py`: `generate_next_id()` und `add_recipe_id()` – ID-Vergabe
-- `storage.py`: `load_recipes()` und `save_recipes()` – Dateiverarbeitung
+- `recipe_input.py`: `ask_recipe()` (Erfassung), `create_recipe()` (Ablauf und Ausgabe)
+- `recipe_features.py`: `ask_recipe_allergies()` (Allergieauswahl aus einer nummerierten Liste)
+- `recipe_management.py`: `generate_next_id()` und `add_recipe_id()` (ID-Vergabe)
+- `storage.py`: `load_recipes()` und `save_recipes()` (Dateiverarbeitung)
+- `main.py`: Aufruf von `create_recipe()` über Menüoption 1
 
 #### 8.9.1 Rezept-Dictionary erstellen
 
-1. `ask_recipe()` ruft nacheinander `ask_recipe_name()`, `ask_portions()` und `ask_ingredients()` auf.
-2. Die Funktion erstellt ein Dictionary mit `name`, `portions` und `ingredients`.
-3. Zusätzlich werden `favorite = False` und `allergies = []` gesetzt.
-4. Das Dictionary wird **noch ohne ID** zurückgegeben.
-5. `generate_next_id(recipes)` ermittelt mit einer `for`-Schleife und einem Vergleich die höchste vorhandene ID, erhöht diese um 1 und gibt bei leerer Liste 1 zurück.
-6. `add_recipe_id(recipe, recipes)` ergänzt das Dictionary um den Schlüssel `id` und gibt es zurück.
+1. `ask_recipe()` ruft `ask_recipe_name()`, `ask_portions()` und `ask_ingredients()` auf.
+2. Anschliessend ruft die Funktion `ask_recipe_allergies()` aus `recipe_features.py` auf.
+3. Die Allergien werden mit Nummern 1 bis 8 gewählt. `fertig` beendet die Auswahl; eine leere Liste ist zulässig. Ungültige und doppelte Nummern werden zurückgewiesen.
+4. `ask_recipe()` erstellt ein Dictionary mit `name`, `portions`, `ingredients`, `favorite = False` und den ausgewählten `allergies`; die ID fehlt noch.
+5. `generate_next_id(recipes)` ermittelt die höchste bereits vorhandene ID und erhöht sie um 1. `add_recipe_id(recipe, recipes)` fügt die neue ID hinzu.
 
 #### 8.9.2 Vollständigen Ablauf ausführen und speichern
 
-Die Funktion `create_recipe()` in `main.py` führt diese Schritte aus:
+Die Funktion `create_recipe()` in **`recipe_input.py`** führt diese Schritte aus:
 
 1. `load_recipes()` lädt die bestehende Rezeptliste.
-2. `ask_recipe()` erfasst die Daten eines neuen Rezepts.
-3. `add_recipe_id(recipe, recipes)` ergänzt die eindeutige ID.
+2. `ask_recipe()` erfasst Name, Portionen, Zutaten und Allergien.
+3. `add_recipe_id(recipe, recipes)` ergänzt eine eindeutige ID.
 4. `recipes.append(recipe)` fügt das Rezept zur Liste hinzu.
 5. `save_recipes(recipes)` schreibt die aktualisierte Liste nach `data/recipes.json`.
-6. `print(recipes)` gibt derzeit die vollständige Rezeptliste zu Test- und Kontrollzwecken aus.
+6. Statt `print(recipes)` gibt die Funktion den neuen Rezeptnamen, die Portionszahl und jede Zutat als `- Menge Einheit Name` aus. Anschliessend folgt die Allergienliste mit einem eigenen Eintrag je ausgewählter Allergie.
 
-Die Funktion wird derzeit gezielt aufgerufen; ihre Integration in das spätere Hauptmenü steht noch aus. Eine separate, benutzerfreundliche Erfolgsbestätigung ist noch nicht implementiert.
+Beispiel für die Konsolenausgabe nach erfolgreicher Erfassung:
+
+```text
+Rezept: Pfannkuchen
+Portionen: 2
+Zutaten:
+- 250.0 g Mehl
+- 200.0 ml Milch
+Allergien:
+- Gluten
+- Laktose
+```
+
+Bei einer leeren Allergienliste wird aktuell trotzdem `Allergien:` ausgegeben, aber kein Aufzählungspunkt. Die Ausgabe ist Teil von `create_recipe()` und damit noch keine zentrale Formatierungsfunktion für alle Menüpunkte.
 
 #### 8.9.3 Fehlerbehandlung und Datensicherheit
 
 - `load_recipes()` behandelt `FileNotFoundError` mit einer leeren Rezeptliste `[]`.
-- `load_recipes()` behandelt `json.JSONDecodeError` mit einer verständlichen Fehlermeldung und `raise`. Dadurch bricht der Ablauf ab, bevor `save_recipes()` ausgeführt wird.
-- Die Funktion `save_recipes()` schreibt derzeit im Modus `"w"` und verwendet noch keine spezielle Behandlung von Schreibfehlern.
-- Bei Fehlern während einer Speicherung darf das Programm künftig keinen Erfolg melden; diese zusätzliche Behandlung ist noch offen.
+- `load_recipes()` behandelt `json.JSONDecodeError` mit einer Fehlermeldung und `raise`; der Ablauf wird vor `save_recipes()` abgebrochen.
+- Eingabefunktionen wiederholen ungültige Angaben, sodass zuvor erfasste gültige Werte nicht verloren gehen.
+- `save_recipes()` schreibt derzeit im Modus `"w"` und verwendet keine spezielle Behandlung von Schreibfehlern.
 
 #### 8.9.4 ID-Vergabe
 
-Die IDs werden nach der höchsten ID der aktuell vorhandenen Rezepte berechnet:
-
-- Höchste vorhandene ID + 1
-- Bei leerer Liste: ID 1
-
-Die Umsetzung verwendet `highest_id = 0`, eine `for`-Schleife und einen `if`-Vergleich. Sie verwendet **nicht** die ursprünglich erwogene Funktion `max()`.
+Die ID entspricht der höchsten ID der aktuell vorhandenen Rezepte plus 1; bei einer leeren Liste beginnt sie bei 1. Die Implementierung verwendet `highest_id = 0`, eine `for`-Schleife und einen Vergleich, nicht `max()`.
 
 #### 8.9.5 Verwendete Python-Konzepte
 
-`dict`, `list`, `append()`, `for`, `if`, `return`, Funktionsparameter und Rückgabewerte, Modul-Imports, `with open()`, `json.dump()`, `json.load()`, `try`/`except`, `raise`.
+`dict`, `list`, `append()`, `for`, `while`, `if`, `return`, f-Strings, Funktionsparameter und Rückgabewerte, Modul-Imports, `with open()`, `json.dump()`, `json.load()`, `try`/`except`, `raise`.
 
 #### 8.9.6 Architekturprinzip
 
-Die Eingabe, ID-Vergabe und dauerhafte Speicherung sind logisch getrennt. `main.py` koordiniert den Ablauf. `storage.py` stellt wiederverwendbare Funktionen zur Dateiverarbeitung bereit. `recipe_management.py` übernimmt die Berechnung und Zuweisung der ID.
+`main.py` verwaltet das Hauptmenü. `recipe_input.py` enthält den Erfassungsablauf und die anschliessende Konsolenausgabe; `recipe_features.py` liefert die Allergieauswahl, `recipe_management.py` die ID und `storage.py` die Dateiverarbeitung. Die Funktionen arbeiten mit dem gemeinsamen Rezept-Dictionary.
 
-### 8.10 Manuelle Tests – Stand US01
+### 8.10 Manuelle Tests – US01 und Dozentenfeedback
 
-Folgende Verhaltensweisen wurden im Verlauf der Entwicklung manuell geprüft:
+Folgende Verhaltensweisen wurden während der Entwicklung manuell geprüft:
 
-- Gültige und ungültige Rezeptnamen sowie Portionszahlen
-- Gültige und ungültige Zutatenangaben einschliesslich negativer Mengen und `inf`
-- Erfassung mehrerer Zutaten und Wiederholung einer ungültigen Ja/Nein-Eingabe
-- Erstellung eines vollständigen Rezept-Dictionaries
-- Vergabe der nächsten ID bei vorhandenen Rezepten und bei leerer Liste
-- JSON-Speicherung und erneutes Laden nach einem Programmneustart
-- Laden bei fehlender `recipes.json` → `[]`
-- Laden bei ungültiger JSON-Datei → `json.JSONDecodeError` und Abbruch
-- Import von `create_recipe()` ohne automatische Rezepterfassung; Start erst beim Funktionsaufruf
+- Gültige und ungültige Rezeptnamen sowie Portionszahlen.
+- Gültige und ungültige Zutatenangaben einschliesslich negativer Mengen und `inf`.
+- Erfassung mehrerer Zutaten und Wiederholung einer ungültigen Ja/Nein-Eingabe.
+- Erstellung eines vollständigen Rezept-Dictionaries sowie Vergabe einer eindeutigen ID.
+- JSON-Speicherung und erneutes Laden nach einem Programmneustart; Ladefehler bei fehlender oder beschädigter Datei.
+- Alle sechs Eingabeaufforderungen in `recipe_input.py` wurden auf Befehlsform und Leerzeichen vor der Eingabe geprüft.
+- `ask_recipe_allergies()` wurde mit den Nummern `1`, `3` und `fertig` getestet (`['Gluten', 'Nüsse']`).
+- Die Übernahme der ausgewählten Allergien durch `ask_recipe()` und ihre Speicherung über `create_recipe()` wurden manuell geprüft.
+- Die leserliche Konsolenausgabe von Name, Portionen, Zutaten und Allergien wurde nach der Erfassung geprüft.
 
-Diese Tests wurden manuell durchgeführt. Automatisierte Tests und die Integrationstests mit dem gemeinsamen Hauptmenü stehen noch aus.
-
+**Abgrenzung:** Die dokumentierten Tests erfolgten manuell im Rahmen der Entwicklung. Ein vollständiger automatisierter Testlauf für sämtliche Module und Menüfunktionen ist nicht belegt.
 
 ## US02 – Rezept importieren
 
 ### Beschreibung
 
-Benutzer können ein bestehendes Rezept aus einer lokalen JSON-Datei importieren. Das Rezept wird vor dem Speichern validiert und anschliessend zur bestehenden Rezeptsammlung hinzugefügt.
+Benutzer können ein einzelnes Rezept aus einer lokalen JSON-Datei importieren. Es wird vor dem Speichern validiert und der bestehenden Rezeptliste hinzugefügt.
 
 ### Importformat
 
-Der Import erfolgt über eine JSON-Datei, die genau ein Rezept enthält.
+Die Importdatei enthält ein JSON-Objekt mit genau einem Rezept. Erforderliche Felder auf Rezept-Ebene:
 
-Folgende Felder sind erforderlich:
-
-| Feld | Datentyp | Beschreibung |
+| Feld | Datentyp | Regel |
 |---|---|---|
-| `name` | String | Nicht leerer Rezeptname |
-| `portions` | Integer | Positive Ganzzahl |
+| `name` | String | Nicht leer, nicht nur Leerzeichen |
+| `portions` | Integer | Positive Ganzzahl; `bool` wird nicht akzeptiert |
 | `ingredients` | Liste | Mindestens eine Zutat |
 
 Jede Zutat muss folgende Felder enthalten:
 
-| Feld | Datentyp | Beschreibung |
+| Feld | Datentyp | Regel |
 |---|---|---|
-| `name` | String | Nicht leerer Zutatenname |
-| `amount` | Integer oder Float | Positive, endliche Zahl |
-| `unit` | String | `g`, `ml` oder `Stück` |
+| `name` | String | Nicht leer, nicht nur Leerzeichen |
+| `amount` | Integer oder Float | Positiv, endlich; kein String oder `bool` |
+| `unit` | String | Exakt `g`, `ml` oder `Stück` |
+
+Beispiel für eine gültige Importdatei (`data/import_tomatensuppe.json`):
+
+```json
+{
+    "name": "Tomatensuppe",
+    "portions": 4,
+    "ingredients": [
+        {"name": "Tomaten", "amount": 500.0, "unit": "g"},
+        {"name": "Wasser", "amount": 300.0, "unit": "ml"}
+    ]
+}
+```
 
 ### Verarbeitung
 
-1. `import_recipe(file_path)` in `storage.py` liest die JSON-Datei ein.
-2. `validate_import_recipe(recipe)` in `validation.py` überprüft die Struktur und die Werte.
-3. Bei einem ungültigen Rezept wird `None` zurückgegeben und der Import abgebrochen.
-4. `import_new_recipe(file_path)` in `main.py` lädt die bestehenden Rezepte.
-5. Nur `name`, `portions` und `ingredients` werden auf Rezept-Ebene übernommen.
-6. `add_recipe_id()` vergibt eine neue eindeutige ID.
-7. Die Standardfelder `favorite = False` und `allergies = []` werden ergänzt.
-8. Das Rezept wird zur bestehenden Liste hinzugefügt und mit `save_recipes()` gespeichert.
+1. `main.py` nimmt über Menüpunkt 2 einen Dateipfad entgegen und ruft `import_new_recipe(file_path)` auf.
+2. `import_new_recipe(file_path)` befindet sich in **`recipe_input.py`**. Es lädt zuerst die bestehende Rezeptliste mit `load_recipes()`.
+3. `import_recipe(file_path)` in `storage.py` öffnet die angegebene JSON-Datei und liest sie mit `json.load()` ein.
+4. `validate_import_recipe(recipe)` in `validation.py` überprüft die Struktur, die Pflichtfelder und sämtliche Zutaten. Bei einem ungültigen Rezept gibt `import_recipe()` `None` zurück.
+5. Bei gültigen Daten übernimmt `import_new_recipe()` auf Rezept-Ebene nur `name`, `portions` und `ingredients` in ein neues Dictionary `clean_recipe`.
+6. `add_recipe_id()` vergibt eine neue ID. Die Standardfelder `favorite = False` und `allergies = []` werden unabhängig von eventuellen zusätzlichen Importfeldern gesetzt.
+7. Die neue Version wird an die bestehende Liste angehängt und mit `save_recipes(recipes)` gespeichert.
+
+**Abgrenzung:** Nicht vorgesehene Felder auf Rezept-Ebene (z. B. `description`) werden nicht mitgespeichert. Die vorhandenen Zutaten-Dictionaries werden hingegen als Liste übernommen und nicht zusätzlich auf unerwartete Schlüssel bereinigt. Die über `ask_recipe_allergies()` gewählten Allergien betreffen ausschliesslich die manuelle Eingabe, nicht den JSON-Import.
 
 ### Fehlerbehandlung
 
-- Fehlende Importdatei: `FileNotFoundError` wird abgefangen.
-- Beschädigtes JSON: `json.JSONDecodeError` wird abgefangen.
-- Ungültige Rezeptdaten: Die Validierung liefert `False`, der Import gibt `None` zurück.
-- Bei einem fehlgeschlagenen Import werden bestehende Rezepte nicht verändert.
-- Ist die gespeicherte Rezeptdatei beschädigt, wird der Fehler weitergegeben, um ein unbeabsichtigtes Überschreiben zu verhindern.
+- Fehlende Importdatei (`FileNotFoundError`): Meldung „Die Datei wurde nicht gefunden.“, Rückgabe `None`.
+- Beschädigtes Import-JSON (`json.JSONDecodeError`): Meldung „Die Importdatei ist beschädigt.“, Rückgabe `None`.
+- Gültiges JSON, aber ungültige Rezeptdaten: Meldung „Das Rezept enthält ungültige Daten.“, Rückgabe `None`.
+- Ist der Import ungültig, beendet `import_new_recipe()` den Vorgang ohne `save_recipes()` aufzurufen. Bestehende Rezepte bleiben unverändert.
+- Beschädigte gespeicherte Daten in `data/recipes.json` werden von `load_recipes()` mit `raise` gemeldet, damit sie nicht überschrieben werden.
+- Über `import_recipe()` steht ein `#`-Kommentar, der auf die Entstehung der Funktion im Rahmen des Feedbacks von Dr. Härer verweist.
 
 ### Durchgeführte Tests
 
-- Gültiges Rezept erfolgreich importiert.
-- Ungültige Rezeptdaten abgelehnt.
-- Fehlende und beschädigte Importdateien behandelt.
-- Mehrere Rezepte nacheinander importiert.
-- Eindeutige IDs vergeben und bestehende Rezepte erhalten.
-- Ein fehlgeschlagener Import verändert die gespeicherten Rezepte nicht.
-- Zusätzliche Felder auf Rezept-Ebene werden beim Speichern ignoriert.
+- Gültige Importdatei erfolgreich eingelesen und gespeichert.
+- Ungültige Rezeptwerte, fehlende Pflichtfelder und fehlerhafte Zutaten abgelehnt.
+- Fehlende Datei und beschädigtes Import-JSON mit passenden Meldungen behandelt.
+- Zwei Rezepte nacheinander importiert; das erste blieb erhalten und die IDs unterschieden sich.
+- Ungültiger Import veränderte die vorhandene Rezeptliste nicht.
+- Zusätzliche Felder auf Rezept-Ebene wurden beim Speichern ignoriert, eine mitgelieferte ID wurde ersetzt.
+- Die zusätzliche Meldung bei ungültigen Rezeptdaten wurde getestet.
 
-## US08 – Nach Zutaten filtern
+## US08 – Nach Zutaten und Allergien filtern
 
 ### Beschreibung
 
-Benutzer können eine oder mehrere Zutaten eingeben. Angezeigt werden nur Rezepte, die alle eingegebenen Zutaten enthalten.
+Die vorhandenen Filterfunktionen können Rezepte nach Zutaten suchen, Rezepte mit bestimmten Allergien ausschliessen und beide Trefferlisten kombinieren. Im aktuellen `main.py` ist der Menüpunkt 8 noch nicht mit diesen Funktionen verbunden.
 
 ### Funktionen (`recipe_features.py`)
 
 | Funktion | Aufgabe |
 |---|---|
-| `recipe_filter()` | Rezepte laden, Suchbegriffe abfragen, passende Rezepte ermitteln und anzeigen; gibt die Liste der passenden Rezepte zurück |
-| `input_ingredients()` | Zutaten nacheinander abfragen, bis `fertig` eingegeben wird; gibt die Liste der Suchbegriffe zurück |
+| `input_ingredients()` | Suchzutaten nacheinander bis `fertig` erfassen; mindestens eine Zutat nötig |
+| `ingredient_filter()` | Rezepte finden, die alle eingegebenen Zutaten enthalten; Ergebnisliste und Namen ausgeben |
+| `user_input_allergies()` | Allergienamen für den **Filter** erfassen; Abschluss mit `fertig` erst nach mindestens einer Auswahl |
+| `allergies_filter()` | Rezepte ausschliessen, die eine der angegebenen Allergien enthalten |
+| `recipe_filter()` | Schnittmenge aus `allergies_filter()` und `ingredient_filter()` bilden |
 
 ### Ablauf
 
-1. `input_ingredients()` fragt in einer `while`-Schleife nach Zutaten. Eingaben werden mit `strip()` und `lower()` vereinheitlicht.
-2. Leere Eingaben werden abgelehnt. `fertig` beendet die Eingabe erst, wenn mindestens eine Zutat erfasst wurde.
-3. `recipe_filter()` erstellt für jedes Rezept eine Liste der Zutatennamen in Kleinbuchstaben.
-4. Die Variable `recipe_fits` startet mit `True`. Fehlt ein Suchbegriff im Rezept, wird sie auf `False` gesetzt und die Prüfung mit `break` beendet.
-5. Passende Rezepte werden gesammelt und mit ihren Namen ausgegeben.
-6. Wird kein Rezept gefunden, erscheint die Meldung „Es wurden keine Rezepte gefunden.“
+1. `input_ingredients()` normalisiert Suchbegriffe mit `strip()` und `lower()`; leere Eingaben werden abgelehnt.
+2. `ingredient_filter()` prüft jeden Suchbegriff gegen die Namen sämtlicher Zutaten eines Rezepts. Es genügt nicht, dass nur einer der Begriffe vorkommt.
+3. `user_input_allergies()` erwartet zur Filterung Allergien **als Text** aus der erlaubten Liste, anders als die nummerierte Auswahl in `ask_recipe_allergies()`.
+4. `allergies_filter()` gibt nur die Rezepte zurück, die keine der vom Benutzer angegebenen Allergien enthalten.
+5. `recipe_filter()` ruft beide Filter nacheinander auf und gibt nur Rezepte zurück, die in beiden Ergebnislisten enthalten sind.
+6. Wenn keine Treffer gefunden werden, geben die Funktionen eine entsprechende Meldung aus.
 
-### Durchgeführte Tests
+### Dokumentierte manuelle Prüfungen
 
-- Ein Suchbegriff, der in mehreren Rezepten vorkommt, zeigt alle diese Rezepte.
-- Mehrere Suchbegriffe zeigen nur Rezepte, die alle enthalten.
-- Suchbegriffe, die in keinem gemeinsamen Rezept vorkommen, führen zur Meldung „keine Rezepte gefunden“.
-- Gross-/Kleinschreibung und Leerzeichen am Anfang und Ende werden ignoriert.
-- Leere Eingabe und `fertig` ohne Zutat werden abgelehnt und erneut abgefragt.
+- Einzelne und mehrere Suchzutaten; fehlende Treffer.
+- Vergleich ohne Beachtung der Gross-/Kleinschreibung bei Zutatennamen.
+- Abweisen leerer Suchbegriffe; `fertig` ohne Suchzutat ist nicht zulässig.
+
+**Hinweis:** Der vorhandene Filtercode wurde im Rahmen dieser Dokumentationspflege mit dem Modul abgeglichen; ein neuer interaktiver Test der kombinierten Filterung wurde dafür nicht durchgeführt.
 
 ## US11 – Favoriten
 
 ### Beschreibung
 
-Benutzer können Rezepte als Favoriten markieren, die Markierung wieder entfernen und alle Favoriten in einer Übersicht anzeigen. Verwendet wird das bestehende Feld `favorite` (`bool`).
+Benutzer können Rezepte als Favoriten markieren, die Markierung entfernen und eine Übersicht über Favoriten abrufen. Das Datenmodell verwendet dafür das Feld `favorite` (`bool`). Die Funktionen sind in `recipe_features.py` vorhanden, im aktuellen Hauptmenü jedoch noch nicht eingebunden (Menüpunkt 9: `pass`).
 
 ### Funktionen (`recipe_features.py`)
 
 | Funktion | Aufgabe |
 |---|---|
-| `get_favorites()` | Übersicht: alle Rezepte mit `favorite = True` anzeigen; gibt die Liste zurück |
-| `edit_favorites()` | Rezepte anzeigen, Rezept und Aktion abfragen, `favorite` setzen und speichern |
-| `user_input1_favorites()` | Gültige Rezept-ID abfragen; wird auch von US12 verwendet |
-| `user_input2_favorites()` | `hinzufügen` oder `entfernen` abfragen |
+| `get_favorites()` | Rezepte mit `favorite = True` sammeln, Namen ausgeben und Liste zurückgeben |
+| `edit_favorites()` | Rezepte samt ID anzeigen, gewünschte Aktion durchführen und speichern |
+| `user_input1_favorites()` | Vorhandene Rezept-ID abfragen |
+| `user_input2_favorites()` | Aktion `hinzufügen` oder `entfernen` abfragen |
 
 ### Ablauf `edit_favorites()`
 
-1. Alle Rezepte werden mit Name, ID und Favoritenstatus angezeigt.
-2. `user_input1_favorites()` fragt nach einer ID, bis eine Zahl eingegeben wird, die als Rezept-ID existiert.
-3. `user_input2_favorites()` fragt nach `hinzufügen` oder `entfernen`, bis eine gültige Eingabe erfolgt (unabhängig von Gross-/Kleinschreibung).
-4. Beim gewählten Rezept wird `favorite` auf `True` bzw. `False` gesetzt und eine Bestätigung ausgegeben.
+1. Alle gespeicherten Rezepte werden mit Name, ID und Favoritenstatus angezeigt.
+2. `user_input1_favorites()` akzeptiert eine existierende Rezept-ID.
+3. `user_input2_favorites()` akzeptiert die Aktionen `hinzufügen` oder `entfernen` unabhängig von Gross-/Kleinschreibung.
+4. Beim gewählten Rezept wird `favorite` auf `True` bzw. `False` gesetzt und eine Meldung ausgegeben.
 5. Die Rezeptliste wird mit `save_recipes()` gespeichert.
 
-### Durchgeführte Tests
+### Bisher in der Dokumentation festgehaltene manuelle Tests
 
-- Rezept als Favorit markieren und wieder entfernen; Änderung bleibt nach erneutem Laden erhalten.
-- Nicht existierende ID (`99`) und Text (`abc`) werden abgelehnt und erneut abgefragt.
-- Ungültige Aktion (`x`) wird abgelehnt; `Hinzufügen` mit Grossbuchstaben wird akzeptiert.
-- Übersicht ohne Favoriten zeigt „Du hast keine Favoriten gespeichert.“; mit Favoriten werden deren Namen angezeigt.
+- Ein Rezept als Favorit markieren und die Markierung entfernen.
+- Ungültige IDs und Aktionen ablehnen.
+- Übersicht mit und ohne Favoriten anzeigen.
 
-## US12 – Allergien
+**Status:** Die Funktionen sind implementiert; ihre Anbindung an den Menüpunkt 9 steht noch aus.
 
-### Beschreibung
+## Allergien – in US01 integriert (zuvor US12)
 
-Benutzer können bei einem Rezept Allergien aus einer festen Auswahlliste hinterlegen und wieder entfernen. Die Allergien werden im bestehenden Feld `allergies` (`list`) gespeichert.
+### Beschreibung und Entscheidung nach Dozentenfeedback
 
-### Auswahlliste
+Die Zuordnung von Allergien ist **keine separat zu implementierende User Story mehr**. Sie ist Bestandteil der manuellen Rezepterfassung (US01). Die Funktion `ask_recipe_allergies()` stammt aus der von Mai vorbereiteten Lösung und wurde in `recipe_input.ask_recipe()` eingebunden.
 
-Die erlaubten Allergietypen sind als Liste `allergies` am Anfang von `recipe_features.py` definiert:
-`Gluten`, `Laktose`, `Nüsse`, `Eier`, `Soja`, `Sesam`, `Krebstiere`, `Weichtiere`.
+Die bisherige Beschreibung einer nachträglichen Allergiebearbeitung über `edit_allergies()` und `user_input1_allergies()`/`user_input2_allergies()` entsprach **nicht** dem hochgeladenen Python-Code: Diese Funktionen sind darin nicht vorhanden. Sie werden deshalb hier nicht als implementiert geführt.
 
-### Funktionen (`recipe_features.py`)
+### Auswahlliste und Eingabe bei US01
 
-| Funktion | Aufgabe |
+In `recipe_features.py` ist folgende feste Liste definiert: `Gluten`, `Laktose`, `Nüsse`, `Eier`, `Soja`, `Sesam`, `Krebstiere`, `Weichtiere`.
+
+1. `ask_recipe_allergies()` zeigt die Allergien mit den Nummern 1 bis 8 an.
+2. Der Benutzer wählt über `Allergie auswählen (1-8 oder fertig): ` eine Nummer aus.
+3. Die gewählte Allergie wird der Rückgabeliste hinzugefügt, wenn sie noch nicht vorhanden ist. Ungültige und doppelte Nummern lösen eine Meldung aus.
+4. `fertig` beendet die Auswahl – auch wenn keine Allergie gewählt wurde.
+5. `ask_recipe()` speichert die Rückgabeliste im Rezept-Dictionary unter `allergies`.
+6. `create_recipe()` speichert das Rezept und gibt die gewählten Allergien unter der Überschrift `Allergien:` einzeln aus.
+
+### Abgrenzung zum Allergiefilter
+
+`user_input_allergies()` und `allergies_filter()` bleiben als eigenständige **Filterfunktionen** in `recipe_features.py` bestehen. Sie nehmen Allergienamen als Text entgegen und suchen Rezepte, die diese Allergien *nicht* enthalten. Sie werden nicht für die Allergiezuordnung während der Rezepterfassung verwendet.
+
+### Durchgeführte manuelle Tests
+
+- Auswahl der Allergien `1` und `3` und Abschluss mit `fertig` → `['Gluten', 'Nüsse']`.
+- Übernahme der Auswahl in das von `ask_recipe()` erzeugte Dictionary.
+- Persistenz der ausgewählten Allergien in `data/recipes.json` nach `create_recipe()`.
+- Übersichtliche Ausgabe der Allergien nach der Rezepterfassung.
+
+**Noch offen:** Eine nachträgliche Allergiebearbeitung ist in diesem Code-Stand nicht umgesetzt. Sie ist nach der geänderten Anforderung kein eigener Teil des aktuellen US01-Erfassungsablaufs.
+
+## 9. Dozentenfeedback – umgesetzte Änderungen
+
+Die Änderungen wurden auf dem Korrektur-Branch entwickelt und betreffen die Benutzerführung und die Modulaufteilung:
+
+| Rückmeldung | Umsetzung im Code |
 |---|---|
-| `edit_allergies()` | Auswahlliste und Rezepte anzeigen, Eingaben abfragen, Allergien hinzufügen oder entfernen und speichern |
-| `user_input1_allergies()` | Allergien nacheinander abfragen, bis `fertig` eingegeben wird; gibt eine Liste gültiger Allergien zurück |
-| `user_input2_allergies()` | `hinzufügen` oder `entfernen` abfragen |
-| `user_input1_favorites()` | Gültige Rezept-ID abfragen (aus US11 wiederverwendet) |
+| Eingaben als Aufforderungen, mit Abstand zur Eingabe | Sechs `input()`-Texte in `recipe_input.py` angepasst; auch `ask_recipe_allergies()` verwendet die Form `Allergie auswählen (1-8 oder fertig): ` |
+| Anmerkung bei der Importfunktion | Zwei `#`-Kommentarzeilen unmittelbar vor `import_recipe()` in `storage.py` mit Verweis auf Dr. Härer |
+| Rezept nicht als Dictionary ausgeben | `create_recipe()` gibt Name, Portionen, Zutaten und ausgewählte Allergien mit `print()` und f-Strings aus |
+| Allergien in die Rezepterfassung aufnehmen | `ask_recipe_allergies()` aus `recipe_features.py` wird in `recipe_input.ask_recipe()` aufgerufen; die Liste wird unter `allergies` gespeichert |
 
-### Ablauf `edit_allergies()`
+**Zusätzliche Moduländerung:** `create_recipe()` und `import_new_recipe()` wurden aus `main.py` nach `recipe_input.py` verschoben. Das Hauptmenü importiert sie und ruft sie über die Optionen 1 und 2 auf.
 
-1. Die Auswahlliste und alle Rezepte mit ihren aktuellen Allergien werden angezeigt.
-2. `user_input1_favorites()` fragt nach einer gültigen Rezept-ID.
-3. `user_input1_allergies()` fragt nach Allergien:
-   - Nur Allergien aus der Auswahlliste werden akzeptiert (Vergleich ohne Gross-/Kleinschreibung).
-   - Gespeichert wird die einheitliche Schreibweise mit grossem Anfangsbuchstaben (`capitalize()`), z. B. `gluten` → `Gluten`.
-   - Eine bereits eingegebene Allergie wird nicht doppelt aufgenommen.
-4. `user_input2_allergies()` fragt nach `hinzufügen` oder `entfernen`.
-5. Für jede gewählte Allergie beim gewählten Rezept:
-   - **Hinzufügen:** Ist sie bereits hinterlegt, erscheint eine Meldung; sonst wird sie mit `append()` ergänzt.
-   - **Entfernen:** Ist sie nicht hinterlegt, erscheint eine Meldung; sonst wird sie mit `remove()` entfernt. Durch die Prüfung vorher entsteht kein `ValueError`.
-6. Die Rezeptliste wird mit `save_recipes()` gespeichert.
+**Abgrenzung:** Das Dozentenfeedback wurde gezielt an den oben genannten Stellen umgesetzt. Andere Eingabeaufforderungen und Anzeigen, insbesondere in nicht damit verbundenen Team-Modulen und teilweise in `main.py`, sind noch nicht einheitlich überarbeitet.
 
-### Durchgeführte Tests
+## 10. Weitere Entwicklungsschritte
 
-- Mehrere Allergien hinzufügen; nur das gewählte Rezept wird verändert.
-- Bereits hinterlegte Allergie erneut hinzufügen → Meldung, kein Duplikat.
-- Nicht hinterlegte Allergie entfernen → Meldung, kein Programmabbruch.
-- Unbekannte Allergie (`Pizza`), leere Eingabe und `fertig` ohne Allergie werden abgelehnt.
-- Unterschiedliche Schreibweisen (`  gluten `, `LAKTOSE`) werden einheitlich gespeichert.
-
-## 9. Weitere Entwicklungsschritte
-
-3. **Weitere User Storys:** Anzeige, Bearbeitung, Löschung, Skalierung, Einkaufsliste, Filter, Favoriten und Allergien nach Gruppenaufteilung integrieren.
-4. **Qualitätssicherung:** Weitere Dateifehler und ungültige Datenstrukturen behandeln; gruppenübergreifende Tests durchführen.
-5. **Dokumentation:** Funktionsbaum, Verantwortlichkeiten und Kontrollfluss bei weiteren Implementierungen aktualisieren.
+1. **Integration:** Vorhandene Funktionen für Rezeptdetails (`recipe_display.py`), Löschen (`recipe_delete.py`), Zutaten-/Allergiefilter und Favoriten in die entsprechenden Menüoptionen von `main.py` einbinden. Bearbeiten ist im hochgeladenen Stand noch ein Platzhalter.
+2. **Qualitätssicherung:** Weitere Dateifehler, gültiges JSON mit unerwarteter Struktur in `data/recipes.json` und gruppenübergreifende Integrationstests bearbeiten. Bisherige Tests waren überwiegend manuell.
+3. **Dokumentation:** Funktionsbaum, Verantwortlichkeiten und Kontrollfluss bei neuen Entwicklungen weiter abgleichen, insbesondere nach Team-Merges und Änderungen an User Storys.
