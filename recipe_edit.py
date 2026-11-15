@@ -61,7 +61,7 @@ def edit_recipe():
             print("Zutaten bearbeiten:")
             for index in range(len(recipe['ingredients'])):
                 ingredient = recipe['ingredients'][index]
-                print(f"({index+4}) {ingredient['amount']} {ingredient['unit']} {ingredient['name']}")
+                print(f"({index+1}) {ingredient['amount']} {ingredient['unit']} {ingredient['name']}")
 
             ingredient_choice = input("\nWähle Zutat-Nr: ")
             ingredient_choice = int(ingredient_choice)-1
@@ -72,16 +72,19 @@ def edit_recipe():
             print("(3) Einheit")
             nd_choice = input("Wähle die Änderungsposition (1-3): ")
 
-                if nd_choice == "1":
-                    ingredient['name'] = input("KORREKTUR Zutat: ")
-                    save_recipes()
-                    print('\n--- Name der Zutat erfolgreich geändert ---\n')
+            if nd_choice == "1":
+                ingredient['name'] = input("KORREKTUR Zutat: ")
+                save_recipes(recipes)
+                print('\n--- Name der Zutat erfolgreich geändert ---\n')
 
-                elif nd_choice == "2":
-                    ingredient['amount'] = input("KORREKTUR Menge: ")
-                    nd_choice = float(nd_choice)
-                    save_recipes()
-                    print('\n--- Menge erfolgreich geändert ---\n')
+            elif nd_choice == "2":
+                ingredient['amount'] = input("KORREKTUR Menge: ")
+                ingredient['amount'] = float(ingredient['amount'])
+                save_recipes(recipes)
+                print('\n--- Menge erfolgreich geändert ---\n')
+
+
+
 
                 
 
