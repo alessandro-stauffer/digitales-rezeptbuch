@@ -2,7 +2,6 @@ from validation import validate_portions, validate_text, validate_amount, valida
 from recipe_features import ask_recipe_allergies
 from recipe_management import add_recipe_id
 from storage import load_recipes, save_recipes, import_recipe
-from recipe_tools import scale_recipe, create_shopping_list
 
 def ask_portions():
     portions = None
