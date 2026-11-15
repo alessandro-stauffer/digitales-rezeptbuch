@@ -83,7 +83,14 @@ def edit_recipe():
                 save_recipes(recipes)
                 print('\n--- Menge erfolgreich geändert ---\n')
 
+            else nd_choice == "3":
+                ingredient['unit'] = input("KORREKTUR Einheit: ")
+                save_recipes(recipes)
+                print('\n--- Einheit erfolgreich geändert ---\n')
 
+            else: print("Eingabe ungültig ! Gib eine gültige Zahl ein. ")
+        else: print("Eingabe ungültig ! Gib eine gültige Zahl ein. ")
+    else: print("Eingabe ungültig ! Gib eine gültige Zahl ein. ")
 
 
                 
