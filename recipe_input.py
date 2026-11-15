@@ -1,5 +1,8 @@
 from validation import validate_portions, validate_text, validate_amount, validate_unit, validate_yes_no
 from recipe_features import ask_recipe_allergies
+from recipe_management import add_recipe_id
+from storage import load_recipes, save_recipes, import_recipe
+from recipe_tools import scale_recipe, create_shopping_list
 
 def ask_portions():
     portions = None
@@ -94,3 +97,33 @@ def ask_recipe():
     }
     return recipe
 
+def create_recipe():
+    recipes = load_recipes()
+    recipe = ask_recipe()
+    recipe = add_recipe_id(recipe, recipes)
+    recipes.append(recipe)
+    save_recipes(recipes)
+    print(f"Rezept: {recipe['name']}")
+    print(f"Portionen: {recipe['portions']}")
+    print("Zutaten:")
+    for ingredient in recipe["ingredients"]:
+        print(f"- {ingredient['amount']} {ingredient['unit']} {ingredient['name']}")
+    print("Allergien:")
+    for allergie in recipe["allergies"]:
+        print(f"- {allergie}")
+
+def import_new_recipe(file_path):
+    recipes = load_recipes()
+    recipe = import_recipe(file_path)
+    if recipe is None:
+        return
+    clean_recipe = {
+        "name": recipe["name"],
+        "portions": recipe["portions"],
+        "ingredients": recipe["ingredients"]
+    }
+    clean_recipe = add_recipe_id(clean_recipe, recipes)
+    clean_recipe["favorite"] = False
+    clean_recipe["allergies"] = []
+    recipes.append(clean_recipe)
+    save_recipes(recipes)
