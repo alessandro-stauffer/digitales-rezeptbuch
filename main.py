@@ -1,7 +1,10 @@
 from recipe_input import create_recipe, import_new_recipe
 from storage import load_recipes
-from recipe_tools import scale_recipe, create_shopping_list
-
+from recipe_tools import scale_recipe_menu, shopping_list_menu
+from recipe_display import show_recipes
+#from recipe_edit import edit_recipe
+from recipe_delete import delete_recipe
+from recipe_features import ingredient_filter, get_favorites, edit_favorites, allergies_filter
 
 def show_menu():
     print("\n=== Digitales Rezeptbuch ===")
@@ -14,7 +17,7 @@ def show_menu():
     print("7. Einkaufsliste erstellen")
     print("8. Nach Zutaten filtern")
     print("9. Favoriten")
-    print("10. Allergien")
+    print("10. Allergien filtern")
     print("0. Programm beenden")
 
 def main():
@@ -28,83 +31,31 @@ def main():
             create_recipe()
 
         elif choice == "2":
-            file_path = input("Dateipfad eingeben: ")
-            import_new_recipe(file_path)
+            import_new_recipe(input("Dateipfad eingeben: "))
 
         elif choice == "3":
-            recipes = load_recipes()
-            for i, recipe in enumerate(recipes):
-                print(i + 1, recipe["name"])
+            show_recipes()
 
         elif choice == "4":
-            pass
+            print("Rezept bearbeiten ist noch nicht verfügbar.")
 
         elif choice == "5":
-            pass
+            delete_recipe()
 
         elif choice == "6":
-            recipes = load_recipes()
-
-            for i, recipe in enumerate(recipes):
-                print(i + 1, recipe["name"])
-
-            number = input("Wähle eine Rezeptnummer: ")
-
-            if number.isdigit():
-                number = int(number)
-
-                if 1 <= number <= len(recipes):
-                    selected_recipe = recipes[number - 1]
-                    print(selected_recipe["name"])
-
-                    new_portions = input("Für wie viele Personen?")
-                    scaled_recipe = scale_recipe(selected_recipe, new_portions)
-
-                    if scaled_recipe is not None:
-                        print(scaled_recipe["name"], "für", scaled_recipe["portions"], "Personen")
-                        for ingredient in scaled_recipe["ingredients"]:
-                            print(ingredient["amount"], ingredient["unit"], ingredient["name"])
-                else:
-                    print("Diese Rezeptnummer existiert nicht.")
-            else:
-                print("Bitte eine gültige Zahl eingeben")
+            scale_recipe_menu()
 
         elif choice == "7":
-            recipes = load_recipes()
-
-            for i, recipe in enumerate(recipes):
-                print(i + 1, recipe["name"])
-
-            number = input("Wähle eine Rezeptnummer: ")
-            
-            if number.isdigit():
-                number = int(number)
-
-                if 1 <= number <= len(recipes):
-                    selected_recipe = recipes[number - 1]
-                    print(selected_recipe["name"])
-
-                    new_portions = input("Für wie viele Personen? ")
-                    shopping_list = create_shopping_list(selected_recipe, new_portions)
-
-                    if shopping_list is not None:
-                        for ingredient in shopping_list:
-                            print(ingredient["amount"], ingredient["unit"], ingredient["name"])
-
-                else:
-                    print("Diese Rezeptnummer existiert nicht.")
-            else:
-                print("Bitte eine gültige Zahl eingeben.")
-
+            shopping_list_menu()
 
         elif choice == "8":
-            pass
+            ingredient_filter()
 
         elif choice == "9":
-            pass
+            get_favorites()
 
         elif choice == "10":
-            pass
+            allergies_filter()
 
         else:
             print("Diese Option ist nicht verfügbar.")
