@@ -1,5 +1,4 @@
-# Tool: Herstellung Verbindung json
-import json
+# import json überflüssig - gelöscht !
 
 # Tool: Rezepte laden
 from storage import load_recipes
@@ -13,40 +12,81 @@ def show_recipes():
         print('\n--- keine Rezepte vorhanden ---\n')
         return
 
-    # vorhandene Rezepte
-    print('\n=== Deine Rezepte ===')
+    # Schleife zurück
+    while True:
 
-    # i = Startpunkt
-    for i, recipe in enumerate (recipes):
+        # vorhandene Rezepte
+        print('\n=== Deine Rezepte ===')
 
-         # +1 wegen Nummerierung ab 0
-        print(i+1, recipe["name"])
+        # i = Startpunkt
+        for i, recipe in enumerate (recipes):
 
-    # Rezept öffnen
-    number = input('\nWähle Rezept-Nr.: ')
+            # +1 wegen Nummerierung ab 0
+            print(f'{i+1}. {recipe["name"]}')
 
-    # Prüfung int
-    if number.isdigit():
+        # Rezept öffnen
+        number = input('\nWähle Rezept-Nr.: ')
 
-        # Umwandlung Zahl
-        number = int(number)
+        # Prüfung int
+        if number.isdigit():
 
-        # Prüfung Rezeptliste Anz.
-        if 1 <= number <= len(recipes):
-            selected_recipe = recipes[number - 1]
+            # Umwandlung Zahl
+            number = int(number)
 
-            # Detailansicht
-            print('\n --- Rezeptdetails --- ')
-            print(f"Rezept: {selected_recipe['name']}")
-            print(f"Portionen: {selected_recipe['portions']}")
-            print("Zutaten")
-            for ingredients in selected_recipe['ingredients']:
-                print(f' - {ingredients['name']}: {ingredients['amount']} {ingredients['unit']}')
-            print()
+            # Prüfung Rezeptliste Anz.
+            if 1 <= number <= len(recipes):
+                selected_recipe = recipes[number - 1]
 
-        # Fehleingaben
-        else: print(' \n--- kein Rezept gefunden --- \n(Eingabe ungültig ! Siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)\n') # falsche Zahl
-    else: print ('\n--- kein Rezept gefunden ---\n(Eingabe ungültig ! Gib eine gültige Zahl ein)\n') # Buchstaben statt Zahl
+                # Detailansicht
+                print('\n --- Rezeptdetails ---\n')
+
+                print(f'Rezept: {selected_recipe['name']}')
+                print(f'Portionen: {selected_recipe['portions']}')
+
+                print("\nZutaten:")
+
+                for ingredients in selected_recipe['ingredients']:
+                    print(f' - {ingredients['name']}: {ingredients['amount']} {ingredients['unit']}')
+                
+                if selected_recipe['allergies'] == []:
+                    print('\nAllergien: keine erfasst')
+                else: print(f'\nAllergien: {selected_recipe['allergies']}')
+                
+                if selected_recipe['favorite'] == False:
+                    print('Favorit: nein\n')
+                else: print('Favorit: ja\n')
+                
+                print('*** VIEL FREUDE BEIM KOCHEN ! ***\n')
+            
+            # Fehleingaben
+            else: print(' \n--- kein Rezept gefunden --- \n(Eingabe ungültig ! Siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)\n') # falsche Zahl
+        else: print ('\n--- kein Rezept gefunden ---\n(Eingabe ungültig ! Siehe unter "Deine Rezepte" und gib eine gültige ZAHL ein)\n') # Buchstaben statt Zahl
+
+    # To do: Loop einbauen !
+    #    while True:
+    #    move = input('Wähle "r" für zurück zur Rezeptliste oder "h" für zurück ins Hauptmenü: ').strip().lower()
+    #    if move == "r":
+    #        continue
+    #    elif move == "h":
+    #        break
+    #    elif: print('Eingabe ungültig ! Gib "r" oder "h" ein')
+
+
+
+            
+
+
+
+
+
+
+
+
+
+
+# Wähle h für zurück zum Hauptmenü 
+
+# To do: Terminal löschen nach gültiger Eingabe?
 
 # Loop ? main.py oder display.py ?
 # Ansicht nochmals anpassen - aber zuerst gemeinsamer Test am Mo
