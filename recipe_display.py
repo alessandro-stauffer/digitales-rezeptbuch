@@ -50,3 +50,5 @@ def show_recipes():
 
 # Loop ? main.py oder display.py ?
 # Ansicht nochmals anpassen - aber zuerst gemeinsamer Test am Mo
+
+show_recipes()
