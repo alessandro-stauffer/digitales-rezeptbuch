@@ -74,5 +74,3 @@ def show_recipes():
                 break
             elif move == "h":
                 return
-
-# US03 codiert soweit ready - nur noch Doku + "clean-terminal" Funktion noch offen falls noch Zeit bleibt
