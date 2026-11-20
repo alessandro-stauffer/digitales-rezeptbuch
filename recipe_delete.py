@@ -49,6 +49,3 @@ def delete_recipe():
             
                 elif move == "h":
                     return
-
-# Testmode
-delete_recipe()
