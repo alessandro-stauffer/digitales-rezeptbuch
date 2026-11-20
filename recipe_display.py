@@ -2,7 +2,7 @@
 from storage import load_recipes
 
 # Test Funktion select_recipe
-from recipe_select import select_recipe
+from recipe_tools import select_recipe
 
 # Funktion Rezepte anzeigen
 def show_recipes():
