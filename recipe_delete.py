@@ -19,8 +19,9 @@ def delete_recipe():
 
         # Schleife für Sicherheitsfrage
         while True:
+            print('\n=== Rezept löschen ===')
             # Sicherheitsfrage
-            decide = input(f'\n{DelRecipe['name']} wirklich löschen? (j/n): ')
+            decide = input(f'"{DelRecipe['name']}" wirklich löschen? (j/n): ')
             if decide.lower().strip() == "j":
                 ListOfRecipes = load_recipes()
 
