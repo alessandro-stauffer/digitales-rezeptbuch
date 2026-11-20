@@ -50,7 +50,7 @@ def show_recipes():
 
             # Schleife nach ungültiger Eingabe
             while move != "r" and move != "h":
-                move = input('\n[ERROR] Eingabe ungültig ! (gib "r" oder "h" ein): ').lower().strip()
+                move = input('\n[ERROR] Eingabe ungültig ! (gib "R" oder "H" ein): ').lower().strip()
 
             if move == "r":
                 break
