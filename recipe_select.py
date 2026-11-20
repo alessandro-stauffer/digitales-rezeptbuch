@@ -1,8 +1,5 @@
-# Rezept anzeigen Funktion auslagern, doppelte Codes bei Anzeigen von Rezepten
-
 from storage import load_recipes
 
-# Aufbau Funktion (finde geeigneten Funktionsname) -- OK behalten!
 def select_recipe ():
     ListOfRecipes = load_recipes()
 
@@ -11,47 +8,35 @@ def select_recipe ():
         print('\n--- keine Rezepte vorhanden ---\n')
         return
 
+    print ('\n=== Rezeptliste ===')
+
+    # Menünavigation über Nummerierung
+    for index, recipe in enumerate (ListOfRecipes):
+        print(f'{index+1}. {recipe['name']}')
+    
+    # Schleife für Fehleingaben
     while True:
-        print ('\n=== Rezeptliste ===')
+        UsersChoice = input('\nWähle Rezept-Nr.: ')
 
-        # Menünavigation über Nummerierung
-        for index, recipe in enumerate (ListOfRecipes):
-            print(f'{index+1}. {recipe['name']}')
+        # Prüfung, ob Eingabe eine Zahl ist
+        if UsersChoice .isdigit():
 
-        
-        while True:
-            UsersChoice = input('\nWähle Rezept-Nr.: ')
+            # Umwandlung Eingabe von str in int
+            UsersChoice = int(UsersChoice)
 
-            # Prüfung, ob Eingabe eine Zahl ist
-            if UsersChoice .isdigit():
+            # Range Nummerierung Rezepte
+            if 1 <= UsersChoice <= len(ListOfRecipes):
 
-                # Umwandlung Eingabe von str in int
-                UsersChoice = int(UsersChoice)
+                # neue Variable (sonst wird UsersChoice überschrieben)
+                SelectedRecipe = ListOfRecipes[UsersChoice-1]
 
-                # Range Nummerierung Rezepte
-                if 1 <= UsersChoice <= len(ListOfRecipes):
+                # Variable benennen für den Einbau in andere Funktionen
+                return SelectedRecipe
 
-                    # neue Variable (sonst wird UsersChoice überschrieben)
-                    SelectedRecipe = ListOfRecipes[UsersChoice-1]
-
-                    # nur für Test
-                    print(f'{UsersChoice} {SelectedRecipe['name']}')
-                    break
-
-                # Fehleingaben
-                else: print(' \n--- kein Rezept gefunden --- \n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)') # falsche Zahl
-            else: print ('\n--- kein Rezept gefunden ---\n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gib eine gültige ZAHL ein)') # Buchstaben statt Zahl
-                            
-                
+            # Fehleingaben
+            else: print(' \n--- kein Rezept gefunden --- \n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)') # falsche Zahl
+        else: print ('\n--- kein Rezept gefunden ---\n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gib eine gültige ZAHL ein)') # Buchstaben statt Zahl
 
 
-
-
-
-select_recipe()
-
-# ausstehende To Do's:
-# Variabeln unbenennen - zu viel Ähnliches - ERLEDIGT !
-# Fehleingaben - ERLEDIGT !
 
 
