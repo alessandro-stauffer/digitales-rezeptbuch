@@ -31,10 +31,15 @@ def show_recipes():
                         
         if DetailsOfRecipe['allergies'] == []:
             print('\nAllergien: keine erfasst')
-        else: print(f'\nAllergien: {DetailsOfRecipe['allergies']}')
+        
+        # for Schleife für mehrere Allergien, Darstellung 1 Zeile
+        else: 
+            print('\nAllergien: ', end='')
+            for allergies in DetailsOfRecipe['allergies']:
+                print(f'{allergies} ', end='')
                         
         if DetailsOfRecipe['favorite'] == False:
-            print('Favorit: nein\n')
+            print('\nFavorit: nein\n')
         else: print('Favorit: ja\n')
                     
         print('=== VIEL FREUDE BEIM KOCHEN ! ===\n')
@@ -51,3 +56,4 @@ def show_recipes():
                 break
             elif move == "h":
                 return
+
