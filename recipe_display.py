@@ -1,76 +1,59 @@
 # Tool: Rezepte laden
 from storage import load_recipes
 
+# Test Funktion select_recipe
+from recipe_tools import select_recipe
+
 # Funktion Rezepte anzeigen
 def show_recipes():
-    recipes = load_recipes()
 
-    # Status Rezeptbuch ist leer
-    if not recipes:
-        print('\n--- keine Rezepte vorhanden ---\n')
-        return
-
-    # Schleife zurück bei Fehleingabe
+    # Schleife für R am Schluss
     while True:
 
-        # vorhandene Rezepte
-        print('\n=== Deine Rezepte ===')
+        # Aktivierung Funktion Rezeptauswahl
+        DetailsOfRecipe = select_recipe()
 
-        # i = Startpunkt
-        for index, recipe in enumerate (recipes):
+        # Absicherung Absturz wegen Schleife bei leerem Rezeptbuch
+        if not DetailsOfRecipe:
+            return
 
-            # +1 wegen Nummerierung ab 0
-            print(f'{index+1}. {recipe["name"]}')
+        # Detailansicht
+        print('\n=== Rezeptdetails ===')
 
-        # Rezept öffnen
-        while True:
-            number = input('\nWähle Rezept-Nr.: ')
+        print(f'Rezept: {DetailsOfRecipe['name']}')
+        print(f'Portionen: {DetailsOfRecipe['portions']}')
 
-            # Prüfung int
-            if number.isdigit():
+        print("\nZutaten:")
 
-                # Umwandlung Zahl
-                number = int(number)
-
-                # Prüfung Rezeptliste Anz.
-                if 1 <= number <= len(recipes):
-                    selected_recipe = recipes[number - 1]
-
-                    # Detailansicht
-                    print('\n === Rezeptdetails ===\n')
-
-                    print(f'Rezept: {selected_recipe['name']}')
-                    print(f'Portionen: {selected_recipe['portions']}')
-
-                    print("\nZutaten:")
-
-                    for ingredients in selected_recipe['ingredients']:
-                        print(f' - {ingredients['name']}: {ingredients['amount']:.0f} {ingredients['unit']}')
+        # Schleife geht alle Einzelheiten des Rezepts durch
+        for ingredients in DetailsOfRecipe['ingredients']:
+            print(f' - {ingredients['name']}: {ingredients['amount']:.0f} {ingredients['unit']}')
+                        
+        if DetailsOfRecipe['allergies'] == []:
+            print('\nAllergien: keine erfasst')
+        
+        # for Schleife für mehrere Allergien, Darstellung 1 Zeile
+        else: 
+            print('\nAllergien: ', end='')
+            for allergies in DetailsOfRecipe['allergies']:
+                print(f'{allergies} ', end='')
+                        
+        if DetailsOfRecipe['favorite'] == False:
+            print('\nFavorit: nein\n')
+        else: print('Favorit: ja\n')
                     
-                    if selected_recipe['allergies'] == []:
-                        print('\nAllergien: keine erfasst')
-                    else: print(f'\nAllergien: {selected_recipe['allergies']}')
-                    
-                    if selected_recipe['favorite'] == False:
-                        print('Favorit: nein\n')
-                    else: print('Favorit: ja\n')
-                    
-                    print('=== VIEL FREUDE BEIM KOCHEN ! ===\n')
-                    break
-            
-                # Fehleingaben
-                else: print(' \n--- kein Rezept gefunden --- \n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)') # falsche Zahl
-            else: print ('\n--- kein Rezept gefunden ---\n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gib eine gültige ZAHL ein)') # Buchstaben statt Zahl
+        print('=== VIEL FREUDE BEIM KOCHEN ! ===\n')
 
-        # Schleife nach Menüauswahl
+        # Schleife für weiterfahren Menüauswahl r oder h
         while True:
             move = input('wähle "R" für Rezeptliste oder "H" für Hauptmenü: ').strip().lower()
 
             # Schleife nach ungültiger Eingabe
             while move != "r" and move != "h":
-                move = input('\n[ERROR] Eingabe ungültig ! (gib "r" oder "h" ein): ').lower().strip()
+                move = input('\n[ERROR] Eingabe ungültig ! (gib "R" oder "H" ein): ').lower().strip()
 
             if move == "r":
                 break
             elif move == "h":
                 return
+

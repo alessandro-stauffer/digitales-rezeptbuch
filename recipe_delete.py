@@ -1,48 +1,51 @@
-# Tool: Herstellung Verbindung json
-import json
-
 # Tool: Rezepte laden
 from storage import load_recipes
 
 # Tool: Rezepte speichern
 from storage import save_recipes
 
+# Tool: Rezeptliste
+from recipe_tools import select_recipe
+
 def delete_recipe():
-    recipes = load_recipes()
 
-    # Status Rezeptbuch ist leer ()
-    if not recipes:
-        print('\n--- keine Rezepte vorhanden ---\n')
-        return
+    # Schleife für R am Schluss
+    while True:
+        DelRecipe = select_recipe()
 
-    # vorhandene Rezepte ()
-    print('\n=== Deine Rezepte ===')
-    for i, recipe in enumerate (recipes):
-        print(i+1, recipe["name"])
+        # Absicherung Absturz wegen Schleife bei leerem Rezeptbuch
+        if not DelRecipe:
+            return
 
-    # Rezept fürs Löschen wählen
-    number = input('\nWähle Rezept-Nr. zum löschen: ')
-
-# Prüfung int & Umwandlung Zahl ()
-    if number.isdigit():
-        number = int(number)
-
-        # Prüfung Rezeptliste Anz. ()
-        if 1 <= number <= len(recipes):
-            selected_recipe = recipes[number - 1]   
-
+        # Schleife für Sicherheitsfrage
+        while True:
             # Sicherheitsfrage
-            decide = input(f'\n{selected_recipe['name']} wirklich löschen? (j/n): ')
+            decide = input(f'\n{DelRecipe['name']} wirklich löschen? (j/n): ')
             if decide.lower().strip() == "j":
+                ListOfRecipes = load_recipes()
 
                 # löschen über Position Liste
-                recipes.pop(number -1)
-                save_recipes(recipes)
+                ListOfRecipes.remove(DelRecipe)
+                save_recipes(ListOfRecipes)
                 print('\n--- Rezept erfolgreich gelöscht --- \n')
-            else: print ('\n--- Löschvorgang abgebrochen --- \n')
+                break
+                
+            elif decide.strip().lower() == "n":
+                print ('\n--- Löschvorgang abgebrochen --- \n')
+                break
+                            
+            else: print('\n[ERROR] Eingabe ungültig ! (gib "J" oder "N" ein): ')
 
-        # Fehleingaben ()
-        else: print ('\n--- kein Rezept gefunden --- \n(Eingabe ungültig ! Siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)\n')
-    else: print('\n--- kein Rezept gefunden ---\n(Eingabe ungültig ! Gib eine gültige Zahl ein)\n') 
+        # Schleife für weiterfahren Menüauswahl r oder h
+        while True:
+                move = input('Wähle "R" für Rezeptliste oder "H" für Hauptmenü: ').strip().lower()
+                
 
-# Anzeige nachträglich nochmal anpassen, aber zuerst gemeinsamer Funktionstest am Mo
+                while move != "r" and move != "h":
+                    move = input('\n[ERROR] Eingabe ungültig ! (gib "R" oder "H" ein): ').lower().strip()
+
+                if move == "r":
+                    break
+            
+                elif move == "h":
+                    return

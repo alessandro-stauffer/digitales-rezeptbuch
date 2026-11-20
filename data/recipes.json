@@ -103,5 +103,65 @@
         "favorite": false,
         "allergies": [],
         "id": 5
+    },
+    {
+        "name": "Spaghetti Carbonara",
+        "portions": 4,
+        "ingredients": [
+            {
+                "name": "Spaghetti",
+                "amount": 500.0,
+                "unit": "g"
+            },
+            {
+                "name": "Rahm",
+                "amount": 250.0,
+                "unit": "ml"
+            }
+        ],
+        "favorite": false,
+        "allergies": [
+            "Laktose"
+        ],
+        "id": 6
+    },
+    {
+        "name": "Älplermakronen",
+        "portions": 4,
+        "ingredients": [
+            {
+                "name": "Speck",
+                "amount": 250.0,
+                "unit": "g"
+            },
+            {
+                "name": "Kartoffeln",
+                "amount": 500.0,
+                "unit": "g"
+            }
+        ],
+        "favorite": false,
+        "allergies": [
+            "Eier"
+        ],
+        "id": 7
+    },
+    {
+        "name": "Bechamelsauce",
+        "portions": 4,
+        "ingredients": [
+            {
+                "name": "Rahm",
+                "amount": 250.0,
+                "unit": "ml"
+            }
+        ],
+        "favorite": false,
+        "allergies": [
+            "Laktose",
+            "Eier",
+            "Weichtiere"
+        ],
+        "id": 8
     }
 ]
