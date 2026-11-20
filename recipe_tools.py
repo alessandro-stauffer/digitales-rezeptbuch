@@ -190,7 +190,7 @@ def shopping_list_menu(scaled_recipes=None):
     create_shopping_list_pdf(combined_ingredients)
 
 
-# from file recipe_select.py:
+# from removed file recipe_select.py:
 def select_recipe ():
     ListOfRecipes = load_recipes()
 
@@ -221,7 +221,7 @@ def select_recipe ():
                 # neue Variable (sonst wird UsersChoice überschrieben)
                 SelectedRecipe = ListOfRecipes[UsersChoice-1]
 
-                # Variable benennen für den Einbau in andere Funktionen
+                # Variable Endwert select_recipe
                 return SelectedRecipe
 
             # Fehleingaben
