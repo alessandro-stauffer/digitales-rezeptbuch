@@ -190,7 +190,7 @@ def shopping_list_menu(scaled_recipes=None):
     create_shopping_list_pdf(combined_ingredients)
 
 
-# from removed file recipe_select.py:
+# from removed file recipe_select.py: Funktion Rezeptliste
 def select_recipe ():
     ListOfRecipes = load_recipes()
 
