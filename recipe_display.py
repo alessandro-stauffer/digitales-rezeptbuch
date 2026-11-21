@@ -1,9 +1,8 @@
-# Tool: Rezepte laden
-from storage import load_recipes
+# from storage import load_recipes überflüssig - gelöscht !
 
 # Test Funktion select_recipe
 from recipe_tools import select_recipe
-from recipe_details import details_recipe
+from recipe_tools import details_recipe
 
 # Funktion Rezepte anzeigen
 def show_recipes():
@@ -19,35 +18,8 @@ def show_recipes():
             return
 
         details_recipe(SelectRecipe)
-        
-        # Detailansicht
-        #print('\n=== Rezeptdetails ===')
-
-        #print(f'Rezept: {DetailsOfRecipe['name']}')
-        #print(f'Portionen: {DetailsOfRecipe['portions']}')
-
-        #print("\nZutaten:")
-
-        # Schleife geht alle Einzelheiten des Rezepts durch
-        #for ingredients in DetailsOfRecipe['ingredients']:
-         #   print(f' - {ingredients['name']}: {ingredients['amount']:.0f} {ingredients['unit']}')
-                        
-        #if DetailsOfRecipe['allergies'] == []:
-         #   print('\nAllergien: keine erfasst')
-        
-        # for Schleife für mehrere Allergien, Darstellung 1 Zeile
-        #else: 
-         #   print('\nAllergien: ', end='')
-          #  for allergies in DetailsOfRecipe['allergies']:
-           #     print(f'{allergies} ', end='')
-                        
-        #if DetailsOfRecipe['favorite'] == False:
-         #   print('\nFavorit: nein\n')
-        #else: print('Favorit: ja\n')
+        print('\n=== VIEL FREUDE BEIM KOCHEN ! ===\n')
             
-        print('=== VIEL FREUDE BEIM KOCHEN ! ===\n')
-            
-
         # Schleife für weiterfahren Menüauswahl r oder h
         while True:
             move = input('wähle "R" für Rezeptliste oder "H" für Hauptmenü: ').strip().lower()
@@ -60,6 +32,3 @@ def show_recipes():
                 break
             elif move == "h":
                 return
-
-# Test
-show_recipes()
