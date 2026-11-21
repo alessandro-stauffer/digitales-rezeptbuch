@@ -30,13 +30,13 @@ def edit_recipe():
         for ingredient in edit['ingredients']:
             print(f'- [{ingredient['name']} {ingredient['amount']:.0f} {ingredient['unit']}]')
         
-        print('\n4. ALLERGIEN ändern ', end = '')
+        print('\n4. ALLERGIEN überschreiben ', end = '')
         if not edit['allergies']:
             print('[keine erfasst]')
         for allergies in edit['allergies']:
-            print(f'{allergies}', end= '')
+            print(f'[{allergies}]', end = ' ')
         
-        print('5. FAVORIT ', end='')
+        print('\n5. FAVORIT ', end='')
         if edit['favorite'] == True:
             print('[ja]')
         else: print('[nein]')
@@ -57,7 +57,7 @@ def edit_recipe():
 
                 print('--- Rezeptname erfolgreich aktualisiert ---\n')
 
-            elif select == "2":
+            elif select == "2" or select == "2.":
                 edit['portions'] = input('\nNEUE Anzahl Portionen: ')
                 edit['portions'] = int(edit['portions'])
 
@@ -68,13 +68,24 @@ def edit_recipe():
                 print('--- Portionen erfolgreich aktualisiert ---\n')
 
             elif select == "3":
-                print('nv')
+                print('\nZutaten bearbeite ist noch nicht verfügbar.')
 
             elif select == "4":
-                ask_recipe_allergies() # Prüfen: Favoriten werden nicht gespeichert                
+                edit['allergies'] = ask_recipe_allergies()         
+
+                recipes = load_recipes()
+                recipes[index] = edit
+                save_recipes(recipes)
+                print('---Allergien erfolgreich aktualisiert ---\n')
             
             elif select == "5" or select == "5.":
-                #user_input2_favorites()
+                #edit['favorite'] = user_input2_favorites()
+
+                #recipes = load_recipes()
+                #recipes[index] = edit
+                #save_recipes(recipes)
+                #print('--- Favorit erfolgreich aktualisiert ---\n')
+
                 print('\n(Favorit bearbeiten ist noch nicht verfügbar.)\n')
             
             elif select == "6" or select == "r" or select == "6.":
@@ -85,7 +96,7 @@ def edit_recipe():
 
             else: print('\n[ERROR] Eingabe ungültig ! (gib eine Zahl zwischen 1-7 ein) ')
 
-
-
-# Testmode
-edit_recipe()
+# noch offen:
+# Menü 3 Zutaten fehlt noch
+# Allergien eingebaut, aber als Überschreibung anstatt Änderung drin
+# Favorit wird nicht gespeichert

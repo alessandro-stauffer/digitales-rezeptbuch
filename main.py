@@ -2,7 +2,7 @@ from recipe_input import create_recipe, import_new_recipe
 from storage import load_recipes
 from recipe_tools import scale_recipe_menu, shopping_list_menu
 from recipe_display import show_recipes
-#from recipe_edit import edit_recipe
+from recipe_edit import edit_recipe
 from recipe_delete import delete_recipe
 from recipe_features import ingredient_filter, get_favorites, edit_favorites, allergies_filter
 
@@ -37,7 +37,7 @@ def main():
             show_recipes()
 
         elif choice == "4":
-            print("Rezept bearbeiten ist noch nicht verfügbar.")
+            edit_recipe()
 
         elif choice == "5":
             delete_recipe()
