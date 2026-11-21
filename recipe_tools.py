@@ -190,7 +190,8 @@ def shopping_list_menu(scaled_recipes=None):
     create_shopping_list_pdf(combined_ingredients)
 
 
-# from removed file recipe_select.py: Funktion Rezeptliste
+
+# from removed file recipe_select.py: FUNKTION REZEPTLISTE
 def select_recipe ():
     ListOfRecipes = load_recipes()
 
@@ -227,3 +228,32 @@ def select_recipe ():
             # Fehleingaben
             else: print(' \n--- kein Rezept gefunden --- \n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)') # falsche Zahl
         else: print ('\n--- kein Rezept gefunden ---\n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gib eine gültige ZAHL ein)') # Buchstaben statt Zahl
+
+
+
+# from removed file recipe_details.py: FUNKTION REZEPTDETAILS
+def details_recipe(details):
+
+    if not details:
+        print('\n--- keine Rezepte vorhanden ---\n')
+        return
+
+    print(f'\n=== Rezept: {details['name']} ===')
+    print(f'Portionen: {details['portions']}')
+    print('\nZutaten:')
+
+    for ingredients in details['ingredients']:
+        print(f'- {ingredients['name']} {ingredients['amount']:.0f} {ingredients['unit']}')
+
+    if not details['allergies']:
+        print('\nAllergien: keine erfasst')
+
+    else:
+        print(f'\nAllergien: ', end = '')
+        for allergies in details['allergies']:
+            print(f'{allergies}', end = ' ')
+        print()
+
+    if details['favorite'] == True:
+        print('Favorit: ja')
+    else: print('Favorit: nein')
