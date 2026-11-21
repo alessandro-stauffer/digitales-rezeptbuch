@@ -47,8 +47,8 @@
         "id": 3
     },
     {
-        "name": "Pizza Margherita",
-        "portions": 8,
+        "name": "Pizza Napoli",
+        "portions": 10,
         "ingredients": [
             {
                 "name": "Pizzateig",
@@ -105,27 +105,6 @@
         "id": 5
     },
     {
-        "name": "Spaghetti Carbonara",
-        "portions": 4,
-        "ingredients": [
-            {
-                "name": "Spaghetti",
-                "amount": 500.0,
-                "unit": "g"
-            },
-            {
-                "name": "Rahm",
-                "amount": 250.0,
-                "unit": "ml"
-            }
-        ],
-        "favorite": false,
-        "allergies": [
-            "Laktose"
-        ],
-        "id": 6
-    },
-    {
         "name": "Älplermakronen",
         "portions": 4,
         "ingredients": [
@@ -142,7 +121,7 @@
         ],
         "favorite": false,
         "allergies": [
-            "Eier"
+            "Laktose"
         ],
         "id": 7
     }
