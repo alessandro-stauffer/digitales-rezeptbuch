@@ -198,7 +198,9 @@ def select_recipe ():
     # Prüfung Rezeptbuch ist leer
     if not ListOfRecipes:
         print('\n--- keine Rezepte vorhanden ---\n')
-        return
+
+        # 2x None, weil return 2x Variabeln herausgibt
+        return None, None
 
     print ('\n=== Rezeptliste ===')
 
@@ -223,7 +225,7 @@ def select_recipe ():
                 SelectedRecipe = ListOfRecipes[UsersChoice-1]
 
                 # Variable Endwert select_recipe
-                return SelectedRecipe
+                return SelectedRecipe, UsersChoice-1
 
             # Fehleingaben
             else: print(' \n--- kein Rezept gefunden --- \n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)') # falsche Zahl

@@ -17,34 +17,36 @@ def edit_recipe():
             return
 
         # Schleife für 6. und 7.
-        while True:
+        #while True:
 
             #print('\n"Was möchtest du ändern?\n')
             
             # Menüauswahl
-            print(f'\n=== Rezept "{edit['name']}" bearbeiten ===')
-            print(f'\n1. Rezeptname ändern [{edit['name']}]' )
-            print(f'2. Portionen ändern [{edit['portions']}]')
-            
-            print('\n3. Zutaten ändern:')
-            for ingredient in edit['ingredients']:
-                print(f'- [{ingredient['name']} {ingredient['amount']:.0f} {ingredient['unit']}]')
-            
-            print('\n4. Allergien ändern ', end = '')
-            if not edit['allergies']:
-                print('[keine erfasst]')
-            for allergies in edit['allergies']:
-                print(f'{allergies}', end= '')
-            
-            print('5. Favorit ', end='')
-            if edit['favorite'] == True:
-                print('[ja]')
-            else: print('[nein]')
-            
-            print('\n6. zurück zur Rezeptauswahl')
-            print('7. zurück zum Hauptmenü')
+        print(f'\n=== Rezept "{edit['name']}" bearbeiten ===')
+        print(f'\n1. Rezeptname ändern [{edit['name']}]' )
+        print(f'2. Portionen ändern [{edit['portions']}]')
+        
+        print('\n3. Zutaten ändern:')
+        for ingredient in edit['ingredients']:
+            print(f'- [{ingredient['name']} {ingredient['amount']:.0f} {ingredient['unit']}]')
+        
+        print('\n4. Allergien ändern ', end = '')
+        if not edit['allergies']:
+            print('[keine erfasst]')
+        for allergies in edit['allergies']:
+            print(f'{allergies}', end= '')
+        
+        print('5. Favorit ', end='')
+        if edit['favorite'] == True:
+            print('[ja]')
+        else: print('[nein]')
+        
+        print('\n6. zurück zur Rezeptauswahl')
+        print('7. zurück zum Hauptmenü\n')
 
-            select = input('\nWas möchtest du bearbeiten? ')
+        # Schleife für 6. und 7.
+        while True:
+            select = input('Was möchtest du bearbeiten? ')
         
             if select == "1":
                 old_name = edit['name']
@@ -59,7 +61,17 @@ def edit_recipe():
                 print('\n--- Rezeptname erfolgreich aktualisiert ---\n')
 
             elif select == "2":
-                print('nv')
+                old_portions = edit['portions']
+                edit['portions'] = input('NEUE Anzahl Portionen: ')
+                edit['portions'] = int(edit['portions'])
+
+                recipes = load_recipes()
+                for recipe in recipes:
+                    if recipe['portions'] == old_portions:
+                        recipe['portions'] = edit['portions']
+
+                save_recipes(recipes)        
+                print('--- Portionen erfolgreich aktualisiert ---')
 
             elif select == "3":
                 print('nv')
@@ -77,7 +89,7 @@ def edit_recipe():
             elif select == "7": 
                 return
 
-            else: print('\n[ERROR] Eingabe ungültig ! (gib eine Zahl zwischen 1-7 ein): ')
+            else: print('\n[ERROR] Eingabe ungültig ! (gib eine Zahl zwischen 1-7 ein) ')
 
 
 

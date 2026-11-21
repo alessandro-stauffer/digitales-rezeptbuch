@@ -145,23 +145,5 @@
             "Eier"
         ],
         "id": 7
-    },
-    {
-        "name": "Bechamel-Sauce",
-        "portions": 4,
-        "ingredients": [
-            {
-                "name": "Rahm",
-                "amount": 250.0,
-                "unit": "ml"
-            }
-        ],
-        "favorite": false,
-        "allergies": [
-            "Laktose",
-            "Eier",
-            "Weichtiere"
-        ],
-        "id": 8
     }
 ]
