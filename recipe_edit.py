@@ -11,67 +11,61 @@ from recipe_features import ask_recipe_allergies
 
 def edit_recipe():
     while True:
-        edit = select_recipe()
+        edit, index = select_recipe()
 
         if not edit:
-            return
+            return 
 
         # Schleife für 6. und 7.
         #while True:
 
             #print('\n"Was möchtest du ändern?\n')
             
-            # Menüauswahl
+        # Menüauswahl
         print(f'\n=== Rezept "{edit['name']}" bearbeiten ===')
-        print(f'\n1. Rezeptname ändern [{edit['name']}]' )
-        print(f'2. Portionen ändern [{edit['portions']}]')
+        print(f'\n1. REZEPTNAME ändern [{edit['name']}]' )
+        print(f'2. PORTIONEN ändern [{edit['portions']}]')
         
-        print('\n3. Zutaten ändern:')
+        print('\n3. ZUTATEN ändern:')
         for ingredient in edit['ingredients']:
             print(f'- [{ingredient['name']} {ingredient['amount']:.0f} {ingredient['unit']}]')
         
-        print('\n4. Allergien ändern ', end = '')
+        print('\n4. ALLERGIEN ändern ', end = '')
         if not edit['allergies']:
             print('[keine erfasst]')
         for allergies in edit['allergies']:
             print(f'{allergies}', end= '')
         
-        print('5. Favorit ', end='')
+        print('5. FAVORIT ', end='')
         if edit['favorite'] == True:
             print('[ja]')
         else: print('[nein]')
         
-        print('\n6. zurück zur Rezeptauswahl')
-        print('7. zurück zum Hauptmenü\n')
+        print('\n6. zurück zur REZEPTLISTE [R]')
+        print('7. zurück zum HAUPTMENÜ [H]\n')
 
-        # Schleife für 6. und 7.
+        # Schleife für Menünavigation
         while True:
-            select = input('Was möchtest du bearbeiten? ')
+            select = input('Wähle anhand der Nummer was du bearbeiten möchtest: ').strip().lower()
         
-            if select == "1":
-                old_name = edit['name']
-                edit['name'] = input('NEUER Rezeptname: ')
+            if select == "1" or select == "1.":
+                edit['name'] = input('\nNEUER Rezeptname: ')
 
                 recipes = load_recipes()
-                for recipe in recipes:
-                    if recipe['name'] == old_name:
-                        recipe['name'] = edit['name']
-
+                recipes[index] = edit
                 save_recipes(recipes)
-                print('\n--- Rezeptname erfolgreich aktualisiert ---\n')
+
+                print('--- Rezeptname erfolgreich aktualisiert ---\n')
 
             elif select == "2":
-                old_portions = edit['portions']
-                edit['portions'] = input('NEUE Anzahl Portionen: ')
+                edit['portions'] = input('\nNEUE Anzahl Portionen: ')
                 edit['portions'] = int(edit['portions'])
 
                 recipes = load_recipes()
-                for recipe in recipes:
-                    if recipe['portions'] == old_portions:
-                        recipe['portions'] = edit['portions']
+                recipes[index] = edit
+                save_recipes(recipes)
 
-                save_recipes(recipes)        
-                print('--- Portionen erfolgreich aktualisiert ---')
+                print('--- Portionen erfolgreich aktualisiert ---\n')
 
             elif select == "3":
                 print('nv')
@@ -79,14 +73,14 @@ def edit_recipe():
             elif select == "4":
                 ask_recipe_allergies() # Prüfen: Favoriten werden nicht gespeichert                
             
-            elif select == "5":
+            elif select == "5" or select == "5.":
                 #user_input2_favorites()
-                print('Favorit bearbeiten ist noch nicht verfügbar.')
+                print('\n(Favorit bearbeiten ist noch nicht verfügbar.)\n')
             
-            elif select == "6":
+            elif select == "6" or select == "r" or select == "6.":
                 break 
 
-            elif select == "7": 
+            elif select == "7" or select == "h" or select == "7.": 
                 return
 
             else: print('\n[ERROR] Eingabe ungültig ! (gib eine Zahl zwischen 1-7 ein) ')

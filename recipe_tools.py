@@ -228,8 +228,8 @@ def select_recipe ():
                 return SelectedRecipe, UsersChoice-1
 
             # Fehleingaben
-            else: print(' \n--- kein Rezept gefunden --- \n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gebe die Nummer des gewünschten Rezepts ein)') # falsche Zahl
-        else: print ('\n--- kein Rezept gefunden ---\n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gib eine gültige ZAHL ein)') # Buchstaben statt Zahl
+            else: print(' \n--- kein Rezept gefunden --- \n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gebe die Zahl des gewünschten Rezepts ein)') # falsche Zahl
+        else: print ('\n--- kein Rezept gefunden ---\n[ERROR] Eingabe ungültig ! (siehe unter "Deine Rezepte" und gib eine gültige ZAHL ohne Punkt ein)') # Buchstaben statt Zahl
 
 
 
