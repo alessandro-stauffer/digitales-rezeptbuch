@@ -1,10 +1,7 @@
-# from storage import load_recipes überflüssig - gelöscht !
-
-# Test Funktion select_recipe
 from recipe_tools import select_recipe
 from recipe_tools import details_recipe
 
-# Funktion Rezepte anzeigen
+# Funktion REZEPTE ANZEIGEN
 def show_recipes():
 
     # Schleife für R am Schluss
