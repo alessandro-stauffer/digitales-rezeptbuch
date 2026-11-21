@@ -3,6 +3,7 @@ from storage import load_recipes
 
 # Test Funktion select_recipe
 from recipe_tools import select_recipe
+from recipe_details import details_recipe
 
 # Funktion Rezepte anzeigen
 def show_recipes():
@@ -11,38 +12,41 @@ def show_recipes():
     while True:
 
         # Aktivierung Funktion Rezeptauswahl
-        DetailsOfRecipe = select_recipe()
+        SelectRecipe = select_recipe()
 
         # Absicherung Absturz wegen Schleife bei leerem Rezeptbuch
-        if not DetailsOfRecipe:
+        if not SelectRecipe:
             return
 
+        details_recipe(SelectRecipe)
+        
         # Detailansicht
-        print('\n=== Rezeptdetails ===')
+        #print('\n=== Rezeptdetails ===')
 
-        print(f'Rezept: {DetailsOfRecipe['name']}')
-        print(f'Portionen: {DetailsOfRecipe['portions']}')
+        #print(f'Rezept: {DetailsOfRecipe['name']}')
+        #print(f'Portionen: {DetailsOfRecipe['portions']}')
 
-        print("\nZutaten:")
+        #print("\nZutaten:")
 
         # Schleife geht alle Einzelheiten des Rezepts durch
-        for ingredients in DetailsOfRecipe['ingredients']:
-            print(f' - {ingredients['name']}: {ingredients['amount']:.0f} {ingredients['unit']}')
+        #for ingredients in DetailsOfRecipe['ingredients']:
+         #   print(f' - {ingredients['name']}: {ingredients['amount']:.0f} {ingredients['unit']}')
                         
-        if DetailsOfRecipe['allergies'] == []:
-            print('\nAllergien: keine erfasst')
+        #if DetailsOfRecipe['allergies'] == []:
+         #   print('\nAllergien: keine erfasst')
         
         # for Schleife für mehrere Allergien, Darstellung 1 Zeile
-        else: 
-            print('\nAllergien: ', end='')
-            for allergies in DetailsOfRecipe['allergies']:
-                print(f'{allergies} ', end='')
+        #else: 
+         #   print('\nAllergien: ', end='')
+          #  for allergies in DetailsOfRecipe['allergies']:
+           #     print(f'{allergies} ', end='')
                         
-        if DetailsOfRecipe['favorite'] == False:
-            print('\nFavorit: nein\n')
-        else: print('Favorit: ja\n')
-                    
+        #if DetailsOfRecipe['favorite'] == False:
+         #   print('\nFavorit: nein\n')
+        #else: print('Favorit: ja\n')
+            
         print('=== VIEL FREUDE BEIM KOCHEN ! ===\n')
+            
 
         # Schleife für weiterfahren Menüauswahl r oder h
         while True:
@@ -57,3 +61,5 @@ def show_recipes():
             elif move == "h":
                 return
 
+# Test
+show_recipes()
