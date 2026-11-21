@@ -3,6 +3,7 @@
 from storage import load_recipes
 from storage import save_recipes
 from recipe_tools import select_recipe
+from recipe_display import show_recipes
 
 def edit_recipe():
     while True:
@@ -15,7 +16,7 @@ def edit_recipe():
         while True:
 
             # Menüauswahl
-            print(f'\n=== Rezept "{edit['name']}" bearbeiten ===')
+            print('\n=== Rezept bearbeiten ===')
             print('1. Rezeptname ändern')
             print('2. Portionen ändern')
             print('3. Zutaten ändern')
@@ -23,6 +24,8 @@ def edit_recipe():
             print('5. Favorit setzen')
             print('6. zurück zur Rezeptauswahl')
             print('7. zurück zum Hauptmenü')
+
+            
 
             
             select = input('\nWähle Bearbeitungsmenü: ')
