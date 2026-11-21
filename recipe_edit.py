@@ -68,9 +68,40 @@ def edit_recipe():
                 print('--- Portionen erfolgreich aktualisiert ---\n')
 
             elif select == "3":
-                print('\nZutaten bearbeite ist noch nicht verfügbar.')
+                #print('\nZutaten bearbeite ist noch nicht verfügbar.')
 
-            elif select == "4":
+                print(f'\n=== Zutaten "{edit['name']}" ändern ===')
+                for no, ingredients in enumerate(edit['ingredients']):
+                    print(f'{no+1}. {ingredients['name']} {ingredients['amount']} {ingredients['unit']}')
+
+                number = input('\nWähle die Zeile, die du ändern willst: ')
+                number = int(number)-1
+
+                row = edit['ingredients'][number]          
+                print(f'{row['name']} {row['amount']} {row['unit']}')
+
+                row['name'] = input('\nZutat unbenennen: ')
+                print(f'Gespeicherte Änderung: {row['name']}')
+
+                row['amount'] = input('\nMenge ändern: ')
+                row['amount'] = int(row['amount'])
+                print(f'Gespeicherte Änderung: {row['name']} {row['amount']}')           
+
+                row['unit']= input('\nEinheit ändern (g / ml / Stück): ')
+                print(f'Gespeicherte Änderung: {row['name']} {row['amount']} {row['unit']}') 
+                print('\n--- Zutaten erfolgreich aktualisiert ---\n')
+
+                recipes = load_recipes()
+                recipes[index] = edit
+                save_recipes(recipes)
+    
+                
+                #for ingredient in edit['ingredients']:
+                 #   edit['ingredients'] = enumerate (ingredient['name'] ingredient['amount] ingredient['unit'])
+
+
+
+            elif select == "4" or select == "4.":
                 edit['allergies'] = ask_recipe_allergies()         
 
                 recipes = load_recipes()
@@ -97,6 +128,6 @@ def edit_recipe():
             else: print('\n[ERROR] Eingabe ungültig ! (gib eine Zahl zwischen 1-7 ein) ')
 
 # noch offen:
-# Menü 3 Zutaten fehlt noch
+# Menü 3 Zutaten fehlt noch - ERLEDIGT !
 # Allergien eingebaut, aber als Überschreibung anstatt Änderung drin
 # Favorit wird nicht gespeichert

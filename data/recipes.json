@@ -110,12 +110,12 @@
         "ingredients": [
             {
                 "name": "Speck",
-                "amount": 250.0,
+                "amount": 250,
                 "unit": "g"
             },
             {
                 "name": "Kartoffeln",
-                "amount": 500.0,
+                "amount": 500,
                 "unit": "g"
             }
         ],
