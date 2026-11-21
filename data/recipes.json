@@ -1,7 +1,7 @@
 [
     {
         "name": "Tomatensuppe",
-        "portions": 4,
+        "portions": 6,
         "ingredients": [
             {
                 "name": "Tomaten",
@@ -76,7 +76,7 @@
         "id": 4
     },
     {
-        "name": "Hörnli mit Gehacktem",
+        "name": "Hörnli mit Gechacktem",
         "portions": 4,
         "ingredients": [
             {
