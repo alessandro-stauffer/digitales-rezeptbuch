@@ -8,7 +8,7 @@ def show_recipes():
     while True:
 
         # Aktivierung Funktion Rezeptauswahl
-        SelectRecipe = select_recipe()
+        SelectRecipe, index = select_recipe()
 
         # Absicherung Absturz wegen Schleife bei leerem Rezeptbuch
         if not SelectRecipe:

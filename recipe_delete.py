@@ -11,7 +11,7 @@ def delete_recipe():
 
     # Schleife für R am Schluss
     while True:
-        DelRecipe = select_recipe()
+        DelRecipe, index = select_recipe()
 
         # Absicherung Absturz wegen Schleife bei leerem Rezeptbuch
         if not DelRecipe:
