@@ -6,7 +6,7 @@ allergies = ["Gluten", "Laktose", "Nüsse", "Eier", "Soja", "Sesam", "Krebstiere
 def ask_recipe_allergies():
     list_allergies = []
  
-    print("Das sind alle möglichen Allergien:")
+    print("Gib an, welche Allergien von diesem Rezept betroffen sind:")
     number = 1
     for allergy in allergies:
         print(f"{number}: {allergy}")

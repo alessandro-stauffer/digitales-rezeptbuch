@@ -1,3 +1,4 @@
+import os
 from validation import validate_portions
 from storage import load_recipes
 from reportlab.pdfgen import canvas
@@ -188,3 +189,6 @@ def shopping_list_menu(scaled_recipes=None):
         print(ingredient["amount"], ingredient["unit"], ingredient["name"])
 
     create_shopping_list_pdf(combined_ingredients)
+
+def clear_console():
+    os.system("cls")
