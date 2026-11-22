@@ -103,26 +103,5 @@
         "favorite": false,
         "allergies": [],
         "id": 5
-    },
-    {
-        "name": "Älplermakronen",
-        "portions": 4,
-        "ingredients": [
-            {
-                "name": "Speck",
-                "amount": 250,
-                "unit": "g"
-            },
-            {
-                "name": "Kartoffeln",
-                "amount": 500,
-                "unit": "g"
-            }
-        ],
-        "favorite": false,
-        "allergies": [
-            "Laktose"
-        ],
-        "id": 7
     }
 ]

@@ -5,7 +5,7 @@ from storage import load_recipes
 from storage import save_recipes
 
 # Tool: Rezeptliste
-from recipe_tools import select_recipe
+from recipe_display import select_recipe
 
 def delete_recipe():
 
