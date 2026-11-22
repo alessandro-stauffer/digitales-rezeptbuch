@@ -2,6 +2,7 @@ from validation import validate_portions, validate_text, validate_amount, valida
 from recipe_features import ask_recipe_allergies
 from recipe_management import add_recipe_id
 from storage import load_recipes, save_recipes, import_recipe
+from recipe_tools import clear_console
 
 def ask_portions():
     portions = None
@@ -86,6 +87,8 @@ def ask_recipe():
     name = ask_recipe_name()
     portions = ask_portions()
     ingredients = ask_ingredients()
+    clear_console()
+    print("=== Allergien auswählen ===\n")
     allergies = ask_recipe_allergies()
     recipe = {
         "name": name,
@@ -97,14 +100,15 @@ def ask_recipe():
     return recipe
 
 def create_recipe():
+    clear_console()
+    print("=== Neues Rezept erfassen ===\n")
     recipes = load_recipes()
     recipe = ask_recipe()
+    clear_console()
     recipe = add_recipe_id(recipe, recipes)
     recipes.append(recipe)
     save_recipes(recipes)
-    print()
-    print("Dein Rezept wurde erfolgreich erfasst: ")
-    print()
+    print("=== Rezept erfolgreich erfasst ===\n ")
     print(f"Rezept: {recipe['name']}")
     print(f"Portionen: {recipe['portions']}")
     print("Zutaten:")
