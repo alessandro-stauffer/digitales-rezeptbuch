@@ -1,3 +1,8 @@
+from terminal_tools import clear_screen
+from recipe_edit import edit_recipe_menu
+from recipe_delete import delete_recipe_menu
+from recipe_tools import scale_recipe_menu
+
 # Tool: Herstellung Verbindung json
 import json
 
@@ -50,3 +55,36 @@ def show_recipes():
 
 # Loop ? main.py oder display.py ?
 # Ansicht nochmals anpassen - aber zuerst gemeinsamer Test am Mo
+
+def show_recipes_menu():
+    show_recipes()
+
+    while True:
+        print("\n=== Was möchtest du als Nächstes tun? ===")
+        print("1. Rezept bearbeiten")
+        print("2. Rezept löschen")
+        print("3. Rezept skalieren")
+        print("4. Zurück zum Hauptmenü")
+
+        choice = input("Wähle eine Option (1-4): ")
+
+        if choice == "1":
+            clear_screen()
+            edit_recipe_menu()
+            return
+
+        elif choice == "2":
+            clear_screen()
+            delete_recipe_menu()
+            return
+
+        elif choice == "3":
+            clear_screen()
+            scale_recipe_menu()
+            return
+
+        elif choice == "4":
+            return
+
+        else:
+            print("Ungültige Eingabe. Bitte wähle 1 bis 4.")

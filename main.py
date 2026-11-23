@@ -1,10 +1,14 @@
-from recipe_input import create_recipe, import_new_recipe
+from setup_dependencies import install_dependencies
+install_dependencies()
+
+from recipe_input import create_recipe_menu, import_recipe_menu
 from storage import load_recipes
 from recipe_tools import scale_recipe_menu, shopping_list_menu
-from recipe_display import show_recipes
-#from recipe_edit import edit_recipe
-from recipe_delete import delete_recipe
+from recipe_display import show_recipes_menu
+from recipe_edit import edit_recipe_menu
+from recipe_delete import delete_recipe_menu
 from recipe_features import ingredient_filter, get_favorites, edit_favorites, allergies_filter
+from terminal_tools import clear_screen, handle_menu_return
 
 def show_menu():
     print("\n=== Digitales Rezeptbuch ===")
@@ -22,25 +26,28 @@ def show_menu():
 
 def main():
     while True:
+        clear_screen()
         show_menu()
         choice = input("Wähle eine Option: ")
         if choice == "0":
             break
 
-        elif choice == "1":
-            create_recipe()
+        clear_screen()
+
+        if choice == "1":
+            create_recipe_menu()
 
         elif choice == "2":
-            import_new_recipe(input("Dateipfad eingeben: "))
+            import_recipe_menu()
 
         elif choice == "3":
-            show_recipes()
+            show_recipes_menu()
 
         elif choice == "4":
-            print("Rezept bearbeiten ist noch nicht verfügbar.")
+            edit_recipe_menu()
 
         elif choice == "5":
-            delete_recipe()
+            delete_recipe_menu()
 
         elif choice == "6":
             scale_recipe_menu()
@@ -59,6 +66,8 @@ def main():
 
         else:
             print("Diese Option ist nicht verfügbar.")
+            
+        handle_menu_return(choice)
 
 if __name__ == "__main__":
     main()

@@ -2,6 +2,7 @@ from validation import validate_portions, validate_text, validate_amount, valida
 from recipe_features import ask_recipe_allergies
 from recipe_management import add_recipe_id
 from storage import load_recipes, save_recipes, import_recipe
+from terminal_tools import clear_screen
 
 def ask_portions():
     portions = None
@@ -126,3 +127,47 @@ def import_new_recipe(file_path):
     clean_recipe["allergies"] = []
     recipes.append(clean_recipe)
     save_recipes(recipes)
+    print(f"Rezept '{clean_recipe['name']}' wurde erfolgreich importiert.")
+
+def import_recipe_menu():
+    while True:
+        file_path = input("Dateipfad eingeben: ")
+        import_new_recipe(file_path)
+
+        while True:
+            print("\n=== Was möchtest du als Nächstes tun? ===")
+            print("1. Weiteres Rezept importieren")
+            print("2. Zurück zum Hauptmenü")
+
+            choice = input("Wähle eine Option (1 oder 2): ")
+
+            if choice == "1":
+                clear_screen()
+                break
+
+            elif choice == "2":
+                return
+
+            else:
+                print("Ungültige Eingabe. Bitte wähle 1 oder 2.")
+
+def create_recipe_menu():
+    while True:
+        create_recipe()
+
+        while True:
+            print("\n=== Was möchtest du als Nächstes tun? ===")
+            print("1. Weiteres Rezept erfassen")
+            print("2. Zurück zum Hauptmenü")
+
+            choice = input("Wähle eine Option (1 oder 2): ")
+
+            if choice == "1":
+                clear_screen()
+                break
+
+            elif choice == "2":
+                return
+
+            else:
+                print("Ungültige Eingabe. Bitte wähle 1 oder 2.")

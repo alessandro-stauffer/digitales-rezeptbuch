@@ -72,7 +72,7 @@ def scale_recipe_menu():
 
     print("\n=== Was möchtest du als Nächstes tun? ===")
     print("1. Gemeinsame Einkaufsliste als PDF erstellen")
-    print("2.  Zurück zum Hauptmenü")
+    print("2. Zurück zum Hauptmenü")
 
     while True:
         answer = input("Wähle eine Option (1 oder 2): ")

@@ -3,6 +3,8 @@ import json
 
 from storage import load_recipes
 from storage import save_recipes
+from terminal_tools import clear_screen
+from recipe_delete import delete_recipe_menu
 
 def edit_recipe():
     recipes = load_recipes()
@@ -92,10 +94,32 @@ def edit_recipe():
         else: print("Eingabe ungültig ! Gib eine gültige Zahl ein. ")
     #else: print("Eingabe ungültig ! Gib eine gültige Zahl ein. ")
 
+def edit_recipe_menu():
+    while True:
+        edit_recipe()
 
-                
+        while True:
+            print("\n=== Was möchtest du als Nächstes tun? ===")
+            print("1. Weiteres Rezept bearbeiten")
+            print("2. Rezept löschen")
+            print("3. Zurück zum Hauptmenü")
 
+            choice = input("Wähle eine Option (1, 2 oder 3): ")
 
+            if choice == "1":
+                clear_screen()
+                break
+
+            elif choice == "2":
+                clear_screen()
+                delete_recipe_menu()
+                return
+
+            elif choice == "3":
+                return
+
+            else:
+                print("Ungültige Eingabe. Bitte wähle 1, 2 oder 3.")
 
 
             
@@ -126,7 +150,7 @@ def edit_recipe():
 
 
 # Testmode
-edit_recipe() 
+#edit_recipe() 
 
 
 

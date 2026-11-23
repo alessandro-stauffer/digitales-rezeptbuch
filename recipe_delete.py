@@ -7,6 +7,9 @@ from storage import load_recipes
 # Tool: Rezepte speichern
 from storage import save_recipes
 
+# Terminal zu leeren
+from terminal_tools import clear_screen
+
 def delete_recipe():
     recipes = load_recipes()
 
@@ -46,3 +49,24 @@ def delete_recipe():
     else: print('\n--- kein Rezept gefunden ---\n(Eingabe ungültig ! Gib eine gültige Zahl ein)\n') 
 
 # Anzeige nachträglich nochmal anpassen, aber zuerst gemeinsamer Funktionstest am Mo
+
+def delete_recipe_menu():
+    while True:
+        delete_recipe()
+
+        while True:
+            print("\n=== Was möchtest du als Nächstes tun? ===")
+            print("1. Weiteres Rezept löschen")
+            print("2. Zurück zum Hauptmenü")
+
+            choice = input("Wähle eine Option (1 oder 2): ")
+
+            if choice == "1":
+                clear_screen()
+                break
+
+            elif choice == "2":
+                return
+
+            else:
+                print("Ungültige Eingabe. Bitte wähle 1 oder 2.")   

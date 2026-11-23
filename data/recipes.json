@@ -103,5 +103,21 @@
         "favorite": false,
         "allergies": [],
         "id": 5
+    },
+    {
+        "name": "test",
+        "portions": 3,
+        "ingredients": [
+            {
+                "name": "test",
+                "amount": 20.0,
+                "unit": "g"
+            }
+        ],
+        "favorite": false,
+        "allergies": [
+            "Weichtiere"
+        ],
+        "id": 6
     }
 ]
