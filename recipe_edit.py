@@ -175,18 +175,52 @@ def edit_recipe():
         #for recipe in recipes:
         #    print(f"Rezept: {recipe['name']}; ID: {recipe['id']}; Favorites: {recipe['favorite']}")
         #user_input1 = user_input1_favorites()
-                user_input2 = user_input2_favorites()
+             ###   user_input2 = user_input2_favorites()
                 #for recipe in recipes:
                     #if user_input1 == str(recipe["id"]):
-                if user_input2.lower().strip() == "hinzufügen":
-                    edit["favorite"] = True
-                    print(f"Das Rezept für {edit['name']} wurde zu den Favoriten hinzugefügt")
-                elif user_input2.lower().strip() == "entfernen":
-                    edit["favorite"] = False
-                    print(f"Das Rezept für {edit['name']} wurde von den Favoriten entfernt")
+             ###   if user_input2.lower().strip() == "hinzufügen":
+                ###    edit["favorite"] = True
+                   ### print(f"Das Rezept für {edit['name']} wurde zu den Favoriten hinzugefügt")
+               ### elif user_input2.lower().strip() == "entfernen":
+                  ###  edit["favorite"] = False
+                   ### print(f"Das Rezept für {edit['name']} wurde von den Favoriten entfernt")
                 #save_recipes(recipes)
     #else:
      #   get_favorites()
+
+# Update Anpassung neue Version favorites
+#def edit_favorites():
+    #recipes = load_recipes()
+    #print('\n=== Favoriten ===')
+    #print('\n1. Favoriten anzeigen' )
+    #print('2. Favoriten bearbeiten')
+    #show_favorites = input("\nWähle anhand der Nummer was du machen möchtest: ")
+    #if show_favorites == "2" or show_favorites == "2.":
+     #   print() #um einen Abstand vor den Rezepten einzufügen
+      #  for recipe in recipes:
+       #     print(f"Rezept: {recipe['name']}; ID: {recipe['id']}; Favorites: {recipe['favorite']}")
+        #print() #um einen Abstand vor den Rezepten einzufügen
+        #user_input1 = user_input1_favorites()
+                user_input2 = user_input2_favorites()
+        #for recipe in recipes:
+         #   if user_input1 == str(recipe["id"]):
+                if user_input2.upper().strip() == "H" or user_input2.upper().strip() == "1." or user_input2.upper().strip() == "1":
+                    edit["favorite"] = True
+                   # print(f"Das Rezept für {edit['name']} wurde zu den Favoriten hinzugefügt")
+                elif user_input2.upper().strip() == "E" or user_input2.upper().strip() == "2." or user_input2.upper().strip() == "2":
+                    edit["favorite"] = False
+                    #print(f"Das Rezept für {edit['name']} wurde von den Favoriten entfernt")
+
+                    print(f"Das Rezept für {edit['name']} wurde von den Favoriten entfernt")
+        #save_recipes(recipes)
+   # else:
+    #    print() #um einen Abstand vor den Rezepten einzufügen
+     #   get_favorites()
+
+
+
+
+
 
 
 
@@ -207,3 +241,4 @@ def edit_recipe():
 
 # noch offen:
 # Favorit wird nicht gespeichert
+edit_recipe()
