@@ -168,7 +168,7 @@ def edit_recipe():
   
                 # Update Anpassung neue Version favorites
                 user_input2 = user_input2_favorites()
-                if user_input2.upper().strip() == "H" or uer_input2.upper().strip() == "1." or user_input2.upper().strip() == "1":
+                if user_input2.upper().strip() == "H" or user_input2.upper().strip() == "1." or user_input2.upper().strip() == "1":
                     print('--- Favorit erfolgreich aktualisiert ---\n')
                     edit["favorite"] = True
                     
@@ -187,6 +187,4 @@ def edit_recipe():
             elif select == "9" or select == "h" or select == "9.": 
                 return
 
-            else: print('\n[ERROR] Eingabe ungültig ! (gib eine Zahl zwischen 1-8 ein) ')
-
-# Tesmode
+            else: print('\n[ERROR] Eingabe ungültig ! (gib eine Zahl zwischen 1-9 ein) ')
