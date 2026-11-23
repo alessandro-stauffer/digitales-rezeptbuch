@@ -189,5 +189,4 @@ def edit_recipe():
 
             else: print('\n[ERROR] Eingabe ungültig ! (gib eine Zahl zwischen 1-8 ein) ')
 
-# noch offen:
-# Favorit wird nicht gespeichert
+# Tesmode
