@@ -103,7 +103,7 @@
                 "unit": "g"
             }
         ],
-        "favorite": true,
+        "favorite": false,
         "allergies": [
             "Gluten",
             "Laktose"
