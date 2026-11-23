@@ -52,7 +52,7 @@ def main():
             ingredient_filter()
 
         elif choice == "9":
-            get_favorites()
+            edit_favorites()
 
         elif choice == "10":
             allergies_filter()
