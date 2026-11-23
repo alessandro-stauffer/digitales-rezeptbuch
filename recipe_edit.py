@@ -167,10 +167,33 @@ def edit_recipe():
             elif select == "7" or select == "7.":
                 #edit['favorite'] = user_input2_favorites()
 
-                #recipes = load_recipes()
-                #recipes[index] = edit
+# Teile kopiert aus Funktion edit_favorite + Anpassung variable edit statt recipe
+#def edit_favorites():
+    #recipes = load_recipes()
+    #show_favorites = input("1 = Favoriten anzeigen, 2 = Favoriten bearbeiten (Bitte Zahl 1 oder 2 angeben): ")
+    #if show_favorites == "2":
+        #for recipe in recipes:
+        #    print(f"Rezept: {recipe['name']}; ID: {recipe['id']}; Favorites: {recipe['favorite']}")
+        #user_input1 = user_input1_favorites()
+                user_input2 = user_input2_favorites()
+                #for recipe in recipes:
+                    #if user_input1 == str(recipe["id"]):
+                if user_input2.lower().strip() == "hinzufügen":
+                    edit["favorite"] = True
+                    print(f"Das Rezept für {edit['name']} wurde zu den Favoriten hinzugefügt")
+                elif user_input2.lower().strip() == "entfernen":
+                    edit["favorite"] = False
+                    print(f"Das Rezept für {edit['name']} wurde von den Favoriten entfernt")
                 #save_recipes(recipes)
-                #print('--- Favorit erfolgreich aktualisiert ---\n')
+    #else:
+     #   get_favorites()
+
+
+
+                recipes = load_recipes()
+                recipes[index] = edit
+                save_recipes(recipes)
+                print('--- Favorit erfolgreich aktualisiert ---\n')
 
                 print('\n(Favorit bearbeiten ist noch nicht verfügbar.)\n')
             
@@ -184,4 +207,3 @@ def edit_recipe():
 
 # noch offen:
 # Favorit wird nicht gespeichert
-edit_recipe()
