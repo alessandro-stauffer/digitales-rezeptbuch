@@ -2,7 +2,7 @@ from validation import validate_portions, validate_text, validate_amount, valida
 from recipe_features import ask_recipe_allergies
 from recipe_management import add_recipe_id
 from storage import load_recipes, save_recipes, import_recipe
-from recipe_tools import clear_console
+from navigation import clear_screen, choose_next_action
 
 def ask_portions():
     portions = None
@@ -87,7 +87,7 @@ def ask_recipe():
     name = ask_recipe_name()
     portions = ask_portions()
     ingredients = ask_ingredients()
-    clear_console()
+    clear_screen()
     print("=== Allergien auswählen ===\n")
     allergies = ask_recipe_allergies()
     recipe = {
@@ -100,37 +100,105 @@ def ask_recipe():
     return recipe
 
 def create_recipe():
-    clear_console()
-    print("=== Neues Rezept erfassen ===\n")
-    recipes = load_recipes()
-    recipe = ask_recipe()
-    clear_console()
-    recipe = add_recipe_id(recipe, recipes)
-    recipes.append(recipe)
-    save_recipes(recipes)
-    print("=== Rezept erfolgreich erfasst ===\n ")
-    print(f"Rezept: {recipe['name']}")
-    print(f"Portionen: {recipe['portions']}")
-    print("Zutaten:")
-    for ingredient in recipe["ingredients"]:
-        print(f"- {ingredient['amount']} {ingredient['unit']} {ingredient['name']}")
-    print()
-    print("Allergien:")
-    for allergie in recipe["allergies"]:
-        print(f"- {allergie}")
+    while True:
+        clear_screen()
+        print("=== Neues Rezept erfassen ===\n")
+        recipes = load_recipes()
+        recipe = ask_recipe()
+        clear_screen()
+        recipe = add_recipe_id(recipe, recipes)
+        recipes.append(recipe)
+        save_recipes(recipes)
+        print("=== Rezept erfolgreich erfasst ===\n ")
+        print(f"Rezept: {recipe['name']}")
+        print(f"Portionen: {recipe['portions']}")
+        print("Zutaten:")
+        for ingredient in recipe["ingredients"]:
+            print(f"- {ingredient['amount']} {ingredient['unit']} {ingredient['name']}")
+        print()
+        print("Allergien:")
+        for allergie in recipe["allergies"]:
+            print(f"- {allergie}")
 
-def import_new_recipe(file_path):
-    recipes = load_recipes()
-    recipe = import_recipe(file_path)
-    if recipe is None:
-        return
-    clean_recipe = {
-        "name": recipe["name"],
-        "portions": recipe["portions"],
-        "ingredients": recipe["ingredients"]
-    }
-    clean_recipe = add_recipe_id(clean_recipe, recipes)
-    clean_recipe["favorite"] = False
-    clean_recipe["allergies"] = []
-    recipes.append(clean_recipe)
-    save_recipes(recipes)
+        while True:
+            choice = choose_next_action({
+                "1": "Weiteres Rezept erfassen",
+                "2": "Erfasstes Rezept anzeigen",
+                "3": "Erfasstes Rezept bearbeiten",
+                "4": "Zurück zum Hauptmenü"
+            })
+
+            if choice == "1":
+                break
+
+            if choice == "2":
+                from recipe_display import details_recipe
+                clear_screen()
+                details_recipe(recipe)
+
+            if choice == "3":
+                from recipe_edit import edit_recipe
+                edit_recipe(len(recipes) - 1)
+                return
+
+            if choice == "4":
+                clear_screen()
+                return
+
+def import_new_recipe():
+    while True:
+        clear_screen()
+        file_path = input("Dateipfad eingeben: ")
+        recipes = load_recipes()
+        recipe = import_recipe(file_path)
+        if recipe is not None:
+            clean_recipe = {
+                "name": recipe["name"],
+                "portions": recipe["portions"],
+                "ingredients": recipe["ingredients"]
+            }
+            clean_recipe = add_recipe_id(clean_recipe, recipes)
+            clean_recipe["favorite"] = False
+            clean_recipe["allergies"] = []
+            recipes.append(clean_recipe)
+            save_recipes(recipes)
+            clear_screen()
+            print(f"Rezept '{clean_recipe['name']}' erfolgreich importiert.")
+
+        options = {
+            "1": "Weiteres Rezept importieren",
+            "2": "Zurück zum Hauptmenü"
+        }
+
+        if recipe is not None:
+            options = {
+                "1": "Weiteres Rezept importieren",
+                "2": "Importiertes Rezept anzeigen",
+                "3": "Zurück zum Hauptmenü"
+            }
+
+        while True:
+            choice = choose_next_action(options)
+
+            if choice == "1":
+                break
+
+            if choice == "2" and recipe is not None:
+                from recipe_display import details_recipe
+                clear_screen()
+                details_recipe(clean_recipe)
+
+                choice = choose_next_action({
+                    "1": "Weiteres Rezept importieren",
+                    "2": "Zurück zum Hauptmenü"
+                })
+
+                if choice == "1":
+                    break
+
+                clear_screen()
+                return
+
+            else:
+                clear_screen()
+                return

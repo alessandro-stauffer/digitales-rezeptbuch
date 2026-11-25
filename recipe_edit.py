@@ -3,14 +3,24 @@ from storage import save_recipes
 from recipe_display import select_recipe
 from recipe_features import user_input2_favorites
 from recipe_features import ask_recipe_allergies
-from recipe_input import ask_ingredients
+from recipe_input import ask_ingredients, ask_portions, ask_ingredient_amount, ask_ingredient_name, ask_ingredient_unit, ask_recipe_name
+from navigation import clear_screen, choose_next_action
 
-def edit_recipe():
+def edit_recipe(selected_index=None):
     while True:
-        edit, index = select_recipe()
+        clear_screen()
+
+        if selected_index is None:
+            edit, index = select_recipe()
+        else:
+            index = selected_index
+            edit = load_recipes()[index]
+            selected_index = None
 
         if not edit:
             return 
+
+        clear_screen()
 
         # Schleife für Menünavigation
         while True:
@@ -25,7 +35,7 @@ def edit_recipe():
 
             print('\n5. ZUTATEN ändern:')
             for ingredient in edit['ingredients']:
-                print(f'- [{ingredient['name']} {ingredient['amount']:.0f} {ingredient['unit']}]')
+                print(f'- [{ingredient['name']} {ingredient['amount']:g} {ingredient['unit']}]')
             
             print('\n6. ALLERGIEN ändern ', end = '')
             if not edit['allergies']:
@@ -45,24 +55,21 @@ def edit_recipe():
             select = input('\nWähle anhand der Nummer was du bearbeiten möchtest: ').strip().lower()
         
             if select == "1" or select == "1.":
-                edit['name'] = input('\nNEUER Rezeptname: ')
+                edit['name'] = ask_recipe_name()
 
                 recipes = load_recipes()
                 recipes[index] = edit
                 save_recipes(recipes)
                 print('--- Rezeptname erfolgreich aktualisiert ---\n')
-                input('Klicke Enter, um zurück zur Rezeptliste zu gelangen: ')
                 break
 
             elif select == "2" or select == "2.":
-                edit['portions'] = input('\nNEUE Anzahl Portionen: ')
-                edit['portions'] = int(edit['portions'])
+                edit['portions'] = ask_portions()
 
                 recipes = load_recipes()
                 recipes[index] = edit
                 save_recipes(recipes)
                 print('--- Portionen erfolgreich aktualisiert ---\n')
-                input('Klicke Enter, um zurück zur Rezeptliste zu gelangen: ')
                 break
 
             elif select == "3" or select == "3.":
@@ -72,16 +79,17 @@ def edit_recipe():
                 recipes[index] = edit
                 save_recipes(recipes)
                 print('--- Zutaten erfolgreich hinzugefügt ---')
-                input('Klicke Enter, um zurück zur Rezeptliste zu gelangen: ')
                 break
 
             elif select == "4" or select == "4.":
-                print(f'\n=== Zutaten "{edit['name']}" ändern ===')
+                print(f'\n=== Zutaten "{edit['name']}" entfernen ===')
                 for no, ingredients in enumerate(edit['ingredients']):
                     print(f'{no+1}. [{ingredients['name']} {ingredients['amount']} {ingredients['unit']}]')
+
+                deleted = False
                 
                 while True:
-                    number = input('\nWähle die Zeile, die du ändern willst (oder wähle "Z" für zurück): ').lower().strip()
+                    number = input('\nWähle die Zeile, die du entfernen willst (oder wähle "Z" für zurück): ').lower().strip()
                     if number == "z":
                         break
                     
@@ -90,34 +98,43 @@ def edit_recipe():
                         
                         if 0 <= number < len(edit['ingredients']):     
 
-                            row = input(f'"{ingredients['name']} {ingredients['amount']} {ingredients['unit']}" wirklich löschen? (j/n): ').lower().strip()
-                            while row != "j" and row != "n":
-                                print('[ERROR] Eingabe ungültig ! wähle "J" oder "N"')
-                                break
+                            selected_ingredient = edit['ingredients'][number]
+                            row = input(f'"{selected_ingredient['name']} {selected_ingredient['amount']} {selected_ingredient['unit']}" wirklich löschen? (j/n): ').lower().strip()
+                            while row not in ("j", "n"):
+                                row = input('[ERROR] Ungültige Eingabe! Wähle J oder N: ').lower().strip()
 
                             if row == "n":
                                 break
 
                             elif row == "j":
+                                if len(edit['ingredients']) == 1:
+                                    print("[ERROR] Die letzte Zutat darf nicht gelöscht werden.")
+                                    continue
+
                                 delete = edit['ingredients'].pop(number)
                                 print(f'\n--- "{delete['name']} {delete['amount']} {delete['unit']}" erfolgreich entfernt ---\n')
 
                                 recipes = load_recipes()
                                 recipes[index] = edit
-                                save_recipes(recipes) 
+                                save_recipes(recipes)
+                                deleted = True 
 
-                            input('Klicke Enter, um zurück zum Bearbeitungsmenü zu gelangen: ')
                             break         
 
-                        else: print('[ERROR] Eingabe gültig ! Siehe Zutatenliste und gib die ZAHL der gewünschten ZEILE ohne Punkt ein.')
+                        else: print('[ERROR] Eingabe ungültig ! Siehe Zutatenliste und gib die ZAHL der gewünschten ZEILE ohne Punkt ein.')
                     else: print('[ERROR] Eingabe ungültig ! Siehe Zutatenliste und gib die ZAHL der gewünschten ZEILE ohne Punkt ein.')
                                           
+                if deleted:
+                    break
 
+                clear_screen()
 
             elif select == "5" or select == "5.":
                 print(f'\n=== Zutaten "{edit['name']}" ändern ===')
                 for no, ingredients in enumerate(edit['ingredients']):
                     print(f'{no+1}. [{ingredients['name']} {ingredients['amount']} {ingredients['unit']}]')
+
+                changed = False
                 
                 while True:
                     number = input('\nWähle die Zeile, die du ändern willst (oder wähle "Z" für zurück): ').lower().strip()
@@ -133,35 +150,38 @@ def edit_recipe():
                             row = edit['ingredients'][number]          
                             print(f'[{row['name']} {row['amount']} {row['unit']}]')
 
-                            row['name'] = input('\nZutat unbenennen: ')
+                            row['name'] = ask_ingredient_name()
                             print(f'Gespeicherte Änderung: [{row['name']}]')
 
-                            row['amount'] = input('\nMenge ändern: ')
-                            row['amount'] = int(row['amount'])
+                            row['amount'] = ask_ingredient_amount()
                             print(f'Gespeicherte Änderung: [{row['name']} {row['amount']}]')           
 
-                            row['unit']= input('\nEinheit ändern (g / ml / Stück): ')
+                            row['unit']= ask_ingredient_unit()
                             print(f'Gespeicherte Änderung: [{row['name']} {row['amount']} {row['unit']}]') 
                             print('\n--- Zutaten erfolgreich aktualisiert ---\n')
 
                             recipes = load_recipes()
                             recipes[index] = edit
-                            save_recipes(recipes) 
+                            save_recipes(recipes)
+                            changed = True
 
-                            input('Klicke Enter, um zurück zum Bearbeitungsmenü zu gelangen: ')
                             break         
 
-                        else: print('[ERROR] Eingabe gültig ! Siehe Zutatenliste und gib die ZAHL der gewünschten ZEILE ohne Punkt ein.')
+                        else: print('[ERROR] Eingabe ungültig ! Siehe Zutatenliste und gib die ZAHL der gewünschten ZEILE ohne Punkt ein.')
                     else: print('[ERROR] Eingabe ungültig ! Siehe Zutatenliste und gib die ZAHL der gewünschten ZEILE ohne Punkt ein.')
+
+                if changed:
+                    break
+
+                clear_screen()
               
             elif select == "6" or select == "6.":
-                edit['allergies'] = edit['allergies'] + ask_recipe_allergies()         
+                edit['allergies'] = ask_recipe_allergies()       
 
                 recipes = load_recipes()
                 recipes[index] = edit
                 save_recipes(recipes)
                 print('---Allergien erfolgreich aktualisiert ---\n')
-                input('Klicke Enter, um zurück zur Rezeptliste zu gelangen: ')
                 break
             
             elif select == "7" or select == "7.":        
@@ -180,11 +200,40 @@ def edit_recipe():
                 recipes = load_recipes()
                 recipes[index] = edit
                 save_recipes(recipes)
+                break
                             
             elif select == "8" or select == "r" or select == "8.":
                 break 
 
-            elif select == "9" or select == "h" or select == "9.": 
+            elif select == "9" or select == "h" or select == "9.":
+                clear_screen()
                 return
 
             else: print('\n[ERROR] Eingabe ungültig ! (gib eine Zahl zwischen 1-9 ein) ')
+
+        if select in ("8", "8.", "r"):
+            continue
+
+        choice = choose_next_action({
+            "1": "Weiteres Rezept bearbeiten",
+            "2": "Bearbeitetes Rezept anzeigen",
+            "3": "Zurück zum Hauptmenü"
+        })
+
+        if choice == "2":
+            from recipe_display import details_recipe
+            clear_screen()
+            details_recipe(load_recipes()[index])
+
+            choice = choose_next_action({
+                "1": "Weiteres Rezept bearbeiten",
+                "2": "Zurück zum Hauptmenü"
+            })
+
+            if choice == "2":
+                clear_screen()
+                return
+
+        if choice == "3":
+            clear_screen()
+            return

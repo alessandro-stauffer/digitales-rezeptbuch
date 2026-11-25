@@ -1,5 +1,7 @@
 from storage import load_recipes
 from storage import save_recipes
+from navigation import clear_screen, choose_next_action
+from recipe_display import details_recipe
 
 allergies = ["Gluten", "Laktose", "Nüsse", "Eier", "Soja", "Sesam", "Krebstiere", "Weichtiere"]
 
@@ -48,36 +50,58 @@ def input_ingredients():
 
 
 def ingredient_filter():
+    while True:
+        clear_screen()
+        
+        print('\n=== Nach Zutaten filtern ===')
+        print()
+        recipes = load_recipes()
+        result = input_ingredients()
+        filtered_recipe = []
+        for recipe in recipes:
+            recipe_ingredients = recipe["ingredients"]
+            ingredients_names = []
+            for single_ingredient in recipe_ingredients:
+                ingredients_names.append(single_ingredient["name"].lower())
 
-    print('\n=== Nach Zutaten filtern ===')
-    print()
-    recipes = load_recipes()
-    result = input_ingredients()
-    filtered_recipe = []
-    for recipe in recipes:
-        recipe_ingredients = recipe["ingredients"]
-        ingredients_names = []
-        for single_ingredient in recipe_ingredients:
-            ingredients_names.append(single_ingredient["name"].lower())
+            recipe_fits = True
+            for ingredient in result:
+                if ingredient not in ingredients_names:
+                    recipe_fits = False
+                    break
 
-        recipe_fits = True
-        for ingredient in result:
-            if ingredient not in ingredients_names:
-                recipe_fits = False
+            if recipe_fits:
+                filtered_recipe.append(recipe)
+
+        print()
+
+        if filtered_recipe == []:
+            print("Es wurden keine Rezepte gefunden.")
+        else:
+            print(f"Das sind die Rezepte, die deinen Suchkriterien entsprechen: {', '.join([recipe['name'] for recipe in filtered_recipe])}")
+
+        while True:
+            options = {
+                "1": "Nochmals nach Zutaten filtern"
+            }
+
+            for number, recipe in enumerate(filtered_recipe, start=2):
+                options[str(number)] = f"Rezept anzeigen: {recipe['name']}"
+
+            back_option = str(len(filtered_recipe) + 2)
+            options[back_option] = "Zurück zum Hauptmenü"
+
+            choice = choose_next_action(options)
+
+            if choice == "1":
                 break
 
-        if recipe_fits:
-            filtered_recipe.append(recipe)
+            if choice == back_option:
+                clear_screen()
+                return filtered_recipe
 
-    print()
-
-    if filtered_recipe == []:
-        print("Es wurden keine Rezepte gefunden.")
-    else:
-        print(f"Das sind die Rezepte, die deinen Suchkriterien entsprechen: {', '.join([recipe['name'] for recipe in filtered_recipe])}")
-
-    return filtered_recipe
-
+            clear_screen()
+            details_recipe(filtered_recipe[int(choice) - 2])
 
 def user_input1_favorites(): #checkt nur user input1. Wenn ungültig wird wieder gefragt mithilfe while loop
     recipes = load_recipes()
@@ -96,9 +120,13 @@ def user_input2_favorites(): #checkt nur user input2. Wenn ungültig wird wieder
         print('\n=== Favoriten bearbeiten ===')
         print('\n1. Hinzufügen [H]' )
         print('2. Entfernen [E]')
-        user_input2 = input("\nWähle anhand der Nummer was du machen möchtest: ")
-        if user_input2.upper().strip() == "H" or user_input2.upper().strip() == "E":
-            return user_input2
+        user_input2 = input("\nWähle anhand der Nummer was du machen möchtest: ").strip().upper()
+
+        if user_input2 in ("1", "1.", "H"):
+            return "H"
+
+        if user_input2 in ("2", "2.", "E"):
+            return "E"
         print("Deine Eingabe ist ungültig. Bitte überprüfe sie und versuche es noch einmal: ")
 
 
@@ -118,31 +146,67 @@ def get_favorites():
 
 
 def edit_favorites():
-    recipes = load_recipes()
-    print('\n=== Favoriten ===')
-    print('\n1. Favoriten anzeigen' )
-    print('2. Favoriten bearbeiten')
-    show_favorites = input("\nWähle anhand der Nummer was du machen möchtest: ")
-    if show_favorites == "2" or show_favorites == "2.":
-        print() #um einen Abstand vor den Rezepten einzufügen
-        for recipe in recipes:
-            print(f"Rezept: {recipe['name']}; ID: {recipe['id']}; Favorites: {recipe['favorite']}")
-        print() #um einen Abstand vor den Rezepten einzufügen
-        user_input1 = user_input1_favorites()
-        user_input2 = user_input2_favorites()
-        for recipe in recipes:
-            if user_input1 == str(recipe["id"]):
-                if user_input2.upper().strip() == "H":
-                    recipe["favorite"] = True
-                    print(f"Das Rezept für {recipe['name']} wurde zu den Favoriten hinzugefügt")
-                elif user_input2.upper().strip() == "E":
-                    recipe["favorite"] = False
-                    print(f"Das Rezept für {recipe['name']} wurde von den Favoriten entfernt")
-        save_recipes(recipes)
-    else:
-        print() #um einen Abstand vor den Rezepten einzufügen
-        get_favorites()
+    while True:
+        clear_screen()
+        recipes = load_recipes()
+        print('\n=== Favoriten ===')
+        print('\n1. Favoriten anzeigen' )
+        print('2. Favoriten bearbeiten')
+        
+        show_favorites = input("\nWähle anhand der Nummer was du machen möchtest: ").strip()
+        while show_favorites not in ("1", "1.", "2", "2."):
+            show_favorites = input("Ungültige Eingabe. Wähle 1 oder 2: ").strip()
 
+        if show_favorites in ("2", "2.") and not recipes:
+            print("Es sind noch keine Rezepte vorhanden.")
+
+        elif show_favorites == "2" or show_favorites == "2.":
+            print() #um einen Abstand vor den Rezepten einzufügen
+            for recipe in recipes:
+                print(f"Rezept: {recipe['name']}; ID: {recipe['id']}; Favorites: {recipe['favorite']}")
+            print() #um einen Abstand vor den Rezepten einzufügen
+            user_input1 = user_input1_favorites()
+            user_input2 = user_input2_favorites()
+            for recipe in recipes:
+                if user_input1 == str(recipe["id"]):
+                    if user_input2.upper().strip() == "H":
+                        recipe["favorite"] = True
+                        print(f"Das Rezept für {recipe['name']} wurde zu den Favoriten hinzugefügt")
+                    elif user_input2.upper().strip() == "E":
+                        recipe["favorite"] = False
+                        print(f"Das Rezept für {recipe['name']} wurde von den Favoriten entfernt")
+            save_recipes(recipes)
+            
+        else:
+            print()
+            favorite_recipes = get_favorites()
+
+            if favorite_recipes:
+                options = {}
+
+                for number, recipe in enumerate(favorite_recipes, start=1):
+                    options[str(number)] = f"Rezept anzeigen: {recipe['name']}"
+
+                back_option = str(len(favorite_recipes) + 1)
+                options[back_option] = "Zurück zum Hauptmenü"
+
+                choice = choose_next_action(options)
+
+                if choice == back_option:
+                    clear_screen()
+                    return
+
+                clear_screen()
+                details_recipe(favorite_recipes[int(choice) - 1])
+
+        choice = choose_next_action({
+            "1": "Nochmals Favoriten anzeigen oder bearbeiten",
+            "2": "Zurück zum Hauptmenü"
+        })
+
+        if choice == "2":
+            clear_screen()
+            return
 
 def user_input_allergies():
     list_allergies = []
@@ -168,34 +232,57 @@ def user_input_allergies():
 
 
 def allergies_filter():
-    
-    print('\n=== Allergien ===')
-    number = 1
-    print()
-    for allergy in allergies:
-        print(f"{number}: {allergy}")
-        number += 1
+    while True:
+        clear_screen()
 
-    print()
-    input_allergies = user_input_allergies() #Liste mit eingegebenen Allergien
-    recipes = load_recipes()
+        print('\n=== Allergien ===')
+        number = 1
+        print()
+        for allergy in allergies:
+            print(f"{number}: {allergy}")
+            number += 1
 
-    list_filtered_recipes = []
-    for recipe in recipes:
-        recipe_fits = True
-        for allergy in input_allergies:
-            if allergy in recipe["allergies"]:
-                recipe_fits = False
+        print()
+        input_allergies = user_input_allergies() #Liste mit eingegebenen Allergien
+        recipes = load_recipes()
 
-        if recipe_fits == True:
-            list_filtered_recipes.append(recipe) #only appends recipes which do not have the listed allergies in them
+        list_filtered_recipes = []
+        for recipe in recipes:
+            recipe_fits = True
+            for allergy in input_allergies:
+                if allergy in recipe["allergies"]:
+                    recipe_fits = False
 
-    if list_filtered_recipes == []:
-        print("\nEs wurden keine Rezepte ohne diese Allergien gefunden.")
-    else:
-        print(f"\nDiese Rezepte enthalten keine deiner angegebenen Allergien: {', '.join([recipe['name'] for recipe in list_filtered_recipes])}")
-        
-    return list_filtered_recipes 
+            if recipe_fits == True:
+                list_filtered_recipes.append(recipe) #only appends recipes which do not have the listed allergies in them
+
+        if list_filtered_recipes == []:
+            print("\nEs wurden keine Rezepte ohne diese Allergien gefunden.")
+        else:
+            print(f"\nDiese Rezepte enthalten keine deiner angegebenen Allergien: {', '.join([recipe['name'] for recipe in list_filtered_recipes])}")
+
+        while True:
+            options = {
+                "1": "Nochmals nach Allergien filtern"
+            }
+
+            for number, recipe in enumerate(list_filtered_recipes, start=2):
+                options[str(number)] = f"Rezept anzeigen: {recipe['name']}"
+
+            back_option = str(len(list_filtered_recipes) + 2)
+            options[back_option] = "Zurück zum Hauptmenü"
+
+            choice = choose_next_action(options)
+
+            if choice == "1":
+                break
+
+            if choice == back_option:
+                clear_screen()
+                return list_filtered_recipes
+
+            clear_screen()
+            details_recipe(list_filtered_recipes[int(choice) - 2])
   
 
 # def recipe_filter():
