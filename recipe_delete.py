@@ -1,3 +1,6 @@
+# Für Text und Terminal clear zu beahalten
+from navigation import clear_screen, choose_next_action
+
 # Tool: Rezepte laden
 from storage import load_recipes
 
@@ -5,17 +8,21 @@ from storage import load_recipes
 from storage import save_recipes
 
 # Tool: Rezeptliste
-from recipe_display import select_recipe
+from recipe_display import select_recipe, show_recipes
 
 def delete_recipe():
 
     # Schleife für R am Schluss
     while True:
+        clear_screen()
         DelRecipe, index = select_recipe()
 
         # Absicherung Absturz wegen Schleife bei leerem Rezeptbuch
         if not DelRecipe:
+            clear_screen()
             return
+
+        clear_screen()
 
         # Schleife für Sicherheitsfrage
         while True:
@@ -26,7 +33,7 @@ def delete_recipe():
                 ListOfRecipes = load_recipes()
 
                 # löschen über Position Liste
-                ListOfRecipes.remove(DelRecipe)
+                ListOfRecipes.pop(index)
                 save_recipes(ListOfRecipes)
                 print('\n--- Rezept erfolgreich gelöscht --- \n')
                 break
@@ -37,16 +44,20 @@ def delete_recipe():
                             
             else: print('\n[ERROR] Eingabe ungültig ! (gib "J" oder "N" ein): ')
 
-        # Schleife für weiterfahren Menüauswahl r oder h
-        while True:
-                move = input('Wähle "R" für Rezeptliste oder "H" für Hauptmenü: ').strip().lower()
-                
+        # Auswahl Text im Menu
+        choice = choose_next_action({
+            "1": "Rezeptliste ansehen",
+            "2": "Weiteres Rezept löschen",
+            "3": "Zurück zum Hauptmenü"
+        })
 
-                while move != "r" and move != "h":
-                    move = input('\n[ERROR] Eingabe ungültig ! (gib "R" oder "H" ein): ').lower().strip()
+        if choice == "1":
+            show_recipes()
+            return
 
-                if move == "r":
-                    break
-            
-                elif move == "h":
-                    return
+        if choice == "2":
+            continue
+
+        if choice == "3":
+            clear_screen()
+            return

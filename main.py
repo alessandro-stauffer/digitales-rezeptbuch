@@ -1,3 +1,6 @@
+from setup_dependencies import install_dependencies
+install_dependencies()
+
 from recipe_input import create_recipe, import_new_recipe
 from storage import load_recipes
 from recipe_tools import scale_recipe_menu, shopping_list_menu
@@ -31,7 +34,7 @@ def main():
             create_recipe()
 
         elif choice == "2":
-            import_new_recipe(input("Dateipfad eingeben: "))
+            import_new_recipe()
 
         elif choice == "3":
             show_recipes()

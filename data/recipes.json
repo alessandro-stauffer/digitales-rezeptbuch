@@ -26,6 +26,11 @@
                 "name": "Pasta",
                 "amount": 2.0,
                 "unit": "g"
+            },
+            {
+                "name": "Käse",
+                "amount": 40.0,
+                "unit": "g"
             }
         ],
         "favorite": false,
@@ -103,11 +108,87 @@
                 "unit": "g"
             }
         ],
-        "favorite": false,
+        "favorite": true,
         "allergies": [
             "Gluten",
             "Laktose"
         ],
         "id": 6
+    },
+    {
+        "name": "Test",
+        "portions": 8,
+        "ingredients": [
+            {
+                "name": "BANANA",
+                "amount": 30.0,
+                "unit": "g"
+            }
+        ],
+        "favorite": false,
+        "allergies": [],
+        "id": 7
+    },
+    {
+        "name": "Pommes",
+        "portions": 5,
+        "ingredients": [
+            {
+                "name": "Kartoffel",
+                "amount": 1.0,
+                "unit": "g"
+            }
+        ],
+        "favorite": false,
+        "allergies": [],
+        "id": 8
+    },
+    {
+        "name": "Test-Pasta",
+        "portions": 2,
+        "ingredients": [
+            {
+                "name": "Nudeln",
+                "amount": 200,
+                "unit": "g"
+            },
+            {
+                "name": "Tomatensauce",
+                "amount": 150,
+                "unit": "ml"
+            },
+            {
+                "name": "Käse",
+                "amount": 50,
+                "unit": "g"
+            }
+        ],
+        "id": 9,
+        "favorite": false,
+        "allergies": []
+    },
+    {
+        "name": "nudelnn",
+        "portions": 2,
+        "ingredients": [
+            {
+                "name": "Nudeln",
+                "amount": 200,
+                "unit": "g"
+            },
+            {
+                "name": "Tomatensauce",
+                "amount": 150,
+                "unit": "ml"
+            },
+            {
+                "name": "Käse",
+                "amount": 50,
+                "unit": "g"
+            }
+        ],
+        "id": 14,
+        "favorite": false,
+        "allergies": []
     }
 ]

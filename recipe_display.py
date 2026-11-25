@@ -1,35 +1,49 @@
 from storage import load_recipes
+from navigation import clear_screen, choose_next_action
 
 # Funktion REZEPTE ANZEIGEN
 def show_recipes():
 
     # Schleife für R am Schluss
     while True:
+        clear_screen()
 
         # Aktivierung Funktion Rezeptauswahl
         SelectRecipe, index = select_recipe()
 
         # Absicherung Absturz wegen Schleife bei leerem Rezeptbuch
         if not SelectRecipe:
+            clear_screen()
+            print("Es sind noch keine Rezepte vorhanden.")
             return
 
+        clear_screen()
         details_recipe(SelectRecipe)
         print('\n=== VIEL FREUDE BEIM KOCHEN ! ===\n')
             
-        # Schleife für weiterfahren Menüauswahl r oder h
-        while True:
-            move = input('wähle "R" für Rezeptliste oder "H" für Hauptmenü: ').strip().lower()
+        # Schleife, um mehrere Rezepte nacheinander anzuzeigen
+        choice = choose_next_action({
+            "1": "Weiteres Rezept anzeigen",
+            "2": "Dieses Rezept bearbeiten",
+            "3": "Dieses Rezept skalieren",
+            "4": "Zurück zum Hauptmenü"
+        })
 
-            # Schleife nach ungültiger Eingabe
-            while move != "r" and move != "h":
-                move = input('\n[ERROR] Eingabe ungültig ! (gib "R" oder "H" ein): ').lower().strip()
+        if choice == "2":
+            from recipe_edit import edit_recipe
+            edit_recipe(index)
+            return
 
-            if move == "r":
-                break
-            elif move == "h":
-                return
+        if choice == "3":
+            from recipe_tools import scale_recipe_menu
+            scale_recipe_menu(index)
+            return
 
-            
+        if choice == "4":
+            clear_screen()
+            return
+
+        
 
 # from removed file recipe_select.py: FUNKTION REZEPTLISTE
 def select_recipe ():
@@ -85,7 +99,7 @@ def details_recipe(details):
     print('\nZutaten:')
 
     for ingredients in details['ingredients']:
-        print(f'- {ingredients['name']} {ingredients['amount']:.0f} {ingredients['unit']}')
+        print(f'- {ingredients['name']} {ingredients['amount']:g} {ingredients['unit']}')
 
     if not details['allergies']:
         print('\nAllergien: keine erfasst')
